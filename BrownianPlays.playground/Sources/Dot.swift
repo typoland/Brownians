@@ -32,44 +32,10 @@ public final class Dot: Sendable {
     } 
     public init(at: CGPoint, zone: Double) {
         self.at = at
-        self.lowerBound = 0.7 * zone
+        self.lowerBound = 0.7 * zone //0.7 is OK
         self.upperBound = zone
     }
     
-//    @MainActor 
-//    private func exchangeBlockOrbits (with dot: Dot) {
-//        let offset = dot.at - at
-//        print ("offset: \(offset)")
-//        let distance = sqrt(offset.x * offset.x + offset.y * offset.y)
-//        print ("distance \(distance), lowerBound: \(dot.zone.lowerBound)")
-//        let radius = sqrt(distance*distance - dot.zone.lowerBound*dot.zone.lowerBound) 
-//        print ("radius \(radius)")
-//        let circle = GeometricCircle(at:dot.at, radius: radius)
-//        print (circle, dot.innerCircle)
-//        let childDotPoints = circle * dot.innerCircle
-//        print ("tangenTo zone points", childDotPoints)
-//        //let thisDotPoints =  dot.outerCircle * innerCircle
-//        //block orbit in child
-//        if case .points(let a, let b) = childDotPoints {
-//            let offsetA = a - dot.at // offset to up
-//            let angleA = atan2(offsetA.y, offsetA.x)
-//            let offsetB = b - dot.at // offset to up
-//            let angleB = atan2(offsetB.y, offsetB.x)
-//            print ("neigbour", angleA, angleB)
-//            dot.blockedOrbits.add(from: angleB, to: angleA)
-//            print ("DOorbits",dot.blockedOrbits)
-////        } 
-////        if case .points(let a, let b) = thisDotPoints {
-//            let offsetC = b - at // offset to up
-//            let angleC = atan2(offsetC.y, offsetC.x)
-//            let offsetD = a - at // offset to up
-//            let angleD = atan2(offsetD.y, offsetD.x)
-//            print ("self", angleC, angleD)
-//            blockedOrbits.add(from: angleD, to: angleC) 
-//            print ("POorbits", blockedOrbits)
-//        } 
-//        print ("....")
-//    }
     public enum ZoneSide: CaseIterable {
         case up
         case down
@@ -113,7 +79,7 @@ public final class Dot: Sendable {
         //CHECK ZONES
         //var childDots: [Dot] = []
         var dotsAround = allDots.filter {dot in
-            (dot.at |-| at) < upperBound * 1.4 && dot.at != at //&& !isFull
+            (dot.at |-| at) < (upperBound * lowerBound) && dot.at != at //&& !isFull
         }
         var newDots: [Dot] = []
         //print ("dots around:",dotsAround.count)

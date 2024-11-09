@@ -28,7 +28,7 @@ public extension Dot {
 //                    .frame(width: 8, height: 8)
                 CircleShape()
                     .fill(Color.black)
-                    .frame(width: lowerBound * 0.6, height: lowerBound * 0.6)
+                    .frame(width: upperBound * 0.4, height: upperBound * 0.4)
                     //.zIndex(999)
                 if full && !onlyDot{
                     Circle()

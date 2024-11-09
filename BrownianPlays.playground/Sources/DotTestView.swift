@@ -23,14 +23,13 @@ public struct DotTestView: View {
 //        let x = Double(i) * xDiff + xDiff/2
 //        let y = Double(j) * yDiff + yDiff/2
         let middle: (CGSize) -> CGPoint = {size in
-            CGPoint(x: size.width/2, y: size.height-100)
+            CGPoint(x: size.width/2, y: size.height/2)
         }
         
         let dotSize : (CGPoint, CGSize) -> Double = { point, size in
-            let offset = CGPoint(x: size.width/2, y: 0) |-| point
-            let s = cos((offset*Double.tau*1)/size.width*0.71)
+            let offset = CGPoint(x: size.width/2, y: size.height/2) |-| point
+            let s = cos((point.y)/size.height*Double.tau)//size.width*0.71)
             let result = ( s*s) * 12 + 3 //(offset * sin(point.x) + offset * cos(point.y)) / 5.0 + 35.0 /// (offset+0.1/size.width+0.1)
-            //print ("zone at point:", result)
             return result
         }
         
@@ -88,19 +87,25 @@ public struct DotTestView: View {
     }
     public var body: some View {
         GeometryReader {proxy in
-//            let dots = dots(in: proxy.size)
-            ForEach(0..<dots.count, id:\.self) {dotIndex in
-                let dot = dots[dotIndex]
-                dot.view(color: someColor(index: dotIndex), onlyDot: true)
+            Canvas {context, size in
+            
+                //            let dots = dots(in: proxy.size)
+                for dotIndex in 0..<dots.count {
+               // ForEach(0..<dots.count, id:\.self) {dotIndex in
+                    let dot = dots[dotIndex]
+                    let path = CircleShape().path(in: CGRect(x: dot.at.x, y: dot.at.y, width: dot.upperBound * 0.4, height: dot.upperBound * 0.4))
+                    context.fill(path, with: .color(.black))
+                    //dot.view(color: someColor(index: dotIndex), onlyDot: true)
                     
-                    .position(draggedDotPosition ?? dot.at)
-                    .gesture(dragDot(dot))
-            }
-//            Circle().fill(Color.red)
-//                .frame(width:10, height:10)
-//                .position(cursor)
-//            
-//                .gesture(drag)
-        }.background(content: {Color.white})
+                        //.position(draggedDotPosition ?? dot.at)
+                        //.gesture(dragDot(dot))
+                }
+                //            Circle().fill(Color.red)
+                //                .frame(width:10, height:10)
+                //                .position(cursor)
+                //            
+                //                .gesture(drag)
+            }.background(content: {Color.white})
+        }
     }
 }

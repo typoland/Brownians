@@ -1,25 +1,12 @@
 //
-//  Extensions.swift
-//  
+//  CIImage.swift
+//  DotsGenerator
 //
-//  Created by Łukasz Dziedzic on 09/11/2024.
+//  Created by Łukasz Dziedzic on 11/11/2024.
 //
-import AppKit
-import CoreImage
-import Accelerate
 
-//public extension NSImage {
-//    /// Generates a CIImage for this NSImage.
-//    /// - Returns: A CIImage optional.
-//    func ciImage() -> CIImage? {
-//        guard let data = self.tiffRepresentation,
-//              let bitmap = NSBitmapImageRep(data: data) else {
-//            return nil
-//        }
-//        let ci = CIImage(bitmapImageRep: bitmap)
-//        return ci
-//    }
-//}
+import CoreImage
+import AppKit
 
 public extension CGImage {
     static func from(ciImage: CIImage) -> CGImage? {
@@ -30,50 +17,47 @@ public extension CGImage {
         return nil 
     }
 }
+public extension NSColor {
+    var grayValue: Double {
+        let r = self.redComponent
+        let g = self.greenComponent
+        let b = self.blueComponent
+        return 0.299*r + 0.587*g + 0.114*b
+    }
+}
+import Accelerate
 
 public extension CIImage {
-//    var cgImage : CGImage? {
-//        let context = CIContext(options: nil)
-//        if let cgImage = context.createCGImage(self, from: self.extent) {
-//            return cgImage
-//        }
-//        return nil
-//    }
+    //    var cgImage : CGImage? {
+    //        let context = CIContext(options: nil)
+    //        if let cgImage = context.createCGImage(self, from: self.extent) {
+    //            return cgImage
+    //        }
+    //        return nil
+    //    }
     var nsImage : NSImage {
         let rep = NSCIImageRep(ciImage: self)
         let nsImage = NSImage(size: rep.size)
         nsImage.addRepresentation(rep)
         return nsImage 
     }
+    
     var detailMap: CIImage? {
-        guard let image1 = CIFilter.highlightShadowAdjust(
-            image: self, 
-            radius: 15, 
-            shadowAmount: 1, 
-            highlightAmount: 1)  else {return nil}
-        
-        guard let twice = CIFilter.highlightShadowAdjust(
-            image: image1, 
-            radius: 15, 
-            shadowAmount: 1, 
-            highlightAmount: 1) else {return nil}
-        
-//        guard let shadows = CIFilter(name: "CIHighlightShadowAdjust")?.outputImage 
-//        else {return nil}
         guard let edges = CIFilter(name: "CICannyEdgeDetector",
-                                          parameters: [kCIInputImageKey: twice,
-                                                       //"inputGaussianSigma": NSNumber(0)
-                                                      ]
+                                   parameters: [kCIInputImageKey: self,
+                                                //"inputGaussianSigma": NSNumber(0)
+                                               ]
         )?.outputImage else {return nil}
-         
-        print (blurred)
+        guard let blurred = CIFilter(name:"CIGaussianBlur",
+                                     parameters: [kCIInputImageKey: edges,
+                                                  "inputRadius": NSNumber(4)])?.outputImage else {return nil}
         guard let adjusted = CIFilter(name:"CIExposureAdjust",
                                       parameters: [kCIInputImageKey: blurred,
                                                    "inputEV": NSNumber(1.5)
                                                   ])?.outputImage else {return nil}
         return adjusted 
         
-
+        
     }
     
     func pixelColor(at point: CGPoint) -> NSColor {
@@ -82,11 +66,11 @@ public extension CIImage {
         guard let cgImage = CGImage.from(ciImage: pixelImage)
         else { 
             print ("no cgImage")
-            return NSColor.clear
+            return NSColor(red: 0, green: 0, blue: 0, alpha: 1)
         }
         guard var format = vImage_CGImageFormat(cgImage: cgImage) else {
             NSLog("Unable to derive format from image.")
-            return NSColor.clear
+            return NSColor(red: 0, green: 0, blue: 0, alpha: 1)
         }
         
         guard let buf = try? vImage.PixelBuffer(
@@ -96,37 +80,41 @@ public extension CIImage {
                 
         else {
             print ("no buffer")
-            return  NSColor.clear
+            return NSColor(red: 0, green: 0, blue: 0, alpha: 1)
         }
-        print (buf.array.count, buf.array)
+        if buf.count == 1 {
+            let c = Double(buf.array[0])/255.0
+            return NSColor(red: 0.299*c, green: 0.587*c, blue: 0.114*c, alpha: 1)
+        }
         let r = Double(buf.array[0])/255.0
         let g = Double(buf.array[1])/255.0
         let b = Double(buf.array[2])/255.0
         let a = Double(buf.array[3])/255.0
-        
         return NSColor(red: r, green: g, blue: b, alpha: a)
     }
+    
+    
     var detailLevel: Double {
         let filterEdgeDetector = CIFilter(name: "CICannyEdgeDetector",
                                           parameters: [kCIInputImageKey: self,
                                                        //"inputGaussianSigma": NSNumber(0)
                                                       ]
         ) 
-        guard let edges = filterEdgeDetector?.outputImage 
+        guard let definedEdges = filterEdgeDetector?.outputImage 
         else {print ("no edges")
             return 0.0
         }
         
-        guard let cgImage = edges.cgImage //CGImage.from(ciImage: edges)
+        guard let cgImage = CGImage.from(ciImage: definedEdges)
         else { 
-            print ("no cgImage")
+            print ("no cgImage \(definedEdges.extent)")
             return 0.0
         }
         guard var format = vImage_CGImageFormat(cgImage: cgImage) else {
             NSLog("Unable to derive format from image.")
             return 0.0
         }
-
+        
         guard let buf = try? vImage.PixelBuffer(
             cgImage: cgImage,
             cgImageFormat: &format,
@@ -166,7 +154,7 @@ public extension CIImage {
         }
         
         var sum = [0.0, 0.0, 0.0]
-
+        
         
         let componentLength = Double(format.bitsPerPixel) / Double(format.bitsPerComponent)
         

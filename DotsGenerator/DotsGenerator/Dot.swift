@@ -20,8 +20,6 @@ public final class Dot: Sendable {
     
     public var neighbors: [CGPoint] = []
     private var isFull: Bool = false
-    
-    public var blockedOrbits = AnglesRanges()
 
     public var innerCircle: GeometricCircle {
         GeometricCircle(at: at, radius: lowerBound)
@@ -76,7 +74,7 @@ public final class Dot: Sendable {
     }
     
     
-    public func addDots(in size: CGSize, 
+    func addDots(in size: CGSize, 
                         allDots: inout [Dot], 
                         zoneClosure: (CGPoint) -> Double = {_ in 50.0},
                         strengthClosure:(CGPoint) -> Double = {_ in 0.5}) -> [Dot]  {
@@ -136,7 +134,7 @@ public final class Dot: Sendable {
 //         neighbors.append(point)
 //    }
     
-    public func nextPoints(with dot: Dot) -> [CGPoint]  {
+    func nextPoints(with dot: Dot) -> [CGPoint]  {
         
         let c1r =   self.randomInZoneCircle
         let c2r =    dot.randomInZoneCircle

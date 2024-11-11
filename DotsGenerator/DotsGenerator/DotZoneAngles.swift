@@ -1,8 +1,8 @@
 //
 //  DotZoneAngles.swift
-//  
+//  DotsGenerator
 //
-//  Created by Łukasz Dziedzic on 07/11/2024.
+//  Created by Łukasz Dziedzic on 11/11/2024.
 //
 
 
@@ -29,8 +29,8 @@ public struct DotZoneAngles: Sendable {
     public var range: ClosedRange<Double> {
         `in` < out ? `in`...out : `in`...out + Double.tau
     }
-    
-    var view: some Shape {
-        ZoneShape(angles: self, size: 30) 
-    }
+//    
+//    var view: some Shape {
+//        ZoneShape(angles: self, size: 30) 
+//    }
 }

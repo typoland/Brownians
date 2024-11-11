@@ -93,7 +93,11 @@ public struct CircleShape : Shape {
  
     public func path(in rect: CGRect) -> Path {
         Path {path in
-            path.addEllipse(in: rect)
+            let shift = NSRect(x: rect.origin.x-rect.width/2,
+                               y: rect.origin.y-rect.height/2, 
+                               width: rect.width,
+                               height:rect.height)
+            path.addEllipse(in: shift)
         }
     }
 }

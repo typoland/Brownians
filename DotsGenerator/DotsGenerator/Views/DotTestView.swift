@@ -57,22 +57,10 @@ struct DotTestView: View {
                 //            Circle().fill(Color.red)
                 //                .frame(width:10, height:10)
                 //                .position(cursor)
-                //            
-                //                .gesture(drag)
+
             }.background(content: {Color.white})
         }
     }
 }
 
-struct CircleShape : Shape {
-    
-    public func path(in rect: CGRect) -> Path {
-        Path {path in
-            let shift = NSRect(x: rect.origin.x-rect.width/2,
-                               y: rect.origin.y-rect.height/2, 
-                               width: rect.width,
-                               height:rect.height)
-            path.addEllipse(in: shift)
-        }
-    }
-}
+

@@ -58,6 +58,23 @@ public extension CIImage {
         )?.outputImage 
         
     }
+    
+    func colorInvert() -> CIImage? {
+        CIFilter(name:"CIColorInvert",
+                 parameters: [
+                    kCIInputImageKey: self
+                    ]
+        )?.outputImage
+    }
+    
+    func documentEnchancer(amount: Double) -> CIImage? {
+        CIFilter(name:"CIDocumentEnhancer",
+                 parameters: [
+                    kCIInputImageKey: self,
+                    "inputAmount": NSNumber(value: amount)]
+        )?.outputImage 
+    }
+    
 }
 
 

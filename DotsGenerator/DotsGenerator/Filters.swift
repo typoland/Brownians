@@ -19,14 +19,17 @@ enum Filters: CaseIterable, Identifiable, Equatable {
     
     static var allCases: [Filters] =
     [
+        .gaussianBlur(radius: 10.0),
+        .invert,
         .morfologyGradient(radius: 8),
         .colorMonochrome(color: NSColor.white, 
                          intensity: 2),
         .colorClamp(
             min: NSColor(red:0.0, green:0.0, blue:0.0, alpha: 0.0), 
             max: NSColor(red:1.0, green:1.0, blue:1.0, alpha: 1.0)),
+        .enhancer(amount: 4.0)
+       
         
-        .gaussianBlur(radius: 10.0)
     ]
     
     init (name: String) throws {
@@ -38,14 +41,18 @@ enum Filters: CaseIterable, Identifiable, Equatable {
     
     var name: String {
         switch self {
-        case .colorMonochrome(_, _):
+        case .colorMonochrome:
             return "Color Monochrome"
-        case .morfologyGradient( _):
+        case .morfologyGradient:
             return "Morfology Gradient"
-        case .colorClamp(_, _):
+        case .colorClamp:
             return "Color Clamp"
-        case .gaussianBlur( _):
+        case .gaussianBlur:
             return "Gaussian Blur"
+        case .invert:
+            return "Invert"
+        case .enhancer:
+            return "Enchance"
         }
     }
     static var names: [String] {
@@ -56,6 +63,8 @@ enum Filters: CaseIterable, Identifiable, Equatable {
     case morfologyGradient(radius: Double)
     case colorClamp(min: NSColor, max: NSColor)
     case gaussianBlur(radius: Double)
+    case invert
+    case enhancer(amount: Double)
     
     func filter(image: CIImage) -> CIImage? {
         switch self {
@@ -67,6 +76,10 @@ enum Filters: CaseIterable, Identifiable, Equatable {
             image.colorClamp(min: min, max: max)
         case .gaussianBlur(radius: let radius):
             image.gaussianBlur(radius: radius)
+        case .invert:
+            image.colorInvert()
+        case .enhancer(let amount):
+            image.documentEnchancer(amount: amount)
         }
     }
 

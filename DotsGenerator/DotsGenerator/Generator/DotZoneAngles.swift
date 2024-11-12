@@ -29,8 +29,4 @@ public struct DotZoneAngles: Sendable {
     public var range: ClosedRange<Double> {
         `in` < out ? `in`...out : `in`...out + Double.tau
     }
-//    
-//    var view: some Shape {
-//        ZoneShape(angles: self, size: 30) 
-//    }
 }

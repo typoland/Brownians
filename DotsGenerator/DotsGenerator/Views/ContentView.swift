@@ -11,9 +11,10 @@ struct ContentView: View {
     //var densityMap: CIImage? = Defaults.ciImage
     @ObservedObject var manager = Manager()
     var body: some View {
-        HStack {
-            MapTypeView(map: $manager.detailMap).frame(width: 250)
-            MapTypeView(map: $manager.strengthMap).frame(width: 250)
+        HStack (spacing: 20) {
+            MapTypeView(map: $manager.detailMap).frame(width: 200)
+            MapTypeView(map: $manager.strengthMap).frame(width: 200)
+            Spacer()
             VStack {
                 DotTestView(manager: manager)
                     .frame(width: manager.size.width,

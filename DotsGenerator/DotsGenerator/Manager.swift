@@ -27,6 +27,7 @@ class Manager : ObservableObject {
     
     
     func updateDots() {
+        
         let imageDotSize: (CGPoint) -> Double =  { point in
             let gray = (try? self.detailMap.value(at: point)) ?? 0.5
             return self.detailDotSize * gray
@@ -36,9 +37,10 @@ class Manager : ObservableObject {
             return self.strengthDotSize * gray
         }
         
-        dots = DotGenerator(size: size, 
-                            dotSize: imageDotSize, 
-                            dotStrength: imageDotStrength).dots
+        DotGenerator.makeDots(in: size, 
+                              result: &dots,
+                              dotSize: imageDotSize, 
+                              dotStrength: imageDotStrength)
     }
     
     

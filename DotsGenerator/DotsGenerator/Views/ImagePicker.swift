@@ -14,7 +14,6 @@ struct ImagePicker: View {
             Image(nsImage: image.nsImage)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: 300)
             Button (action: {
                 isImporting = true
             }, label: {Text("open Image")})

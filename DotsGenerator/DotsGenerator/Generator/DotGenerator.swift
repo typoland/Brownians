@@ -11,25 +11,29 @@ import AppKit
 @MainActor
 public struct DotGenerator {
     
-    var size: CGSize
-    public var dots: [Dot]
+//    var size: CGSize
+//    //public var dots: [Dot]
+//    
+//    public init(
+//        size: CGSize,
+//        resultDots: inout [Dot],
+//        dotSize:     @escaping (CGPoint) -> Double, 
+//        dotStrength: @escaping (CGPoint) -> Double 
+//        
+//    ) {
+//            self.size = size
+//            DotGenerator
+//                .makeDots(in: size, 
+//                          result: &resultDots,
+//                          dotSize: dotSize, 
+//                          dotStrength: dotStrength)
+//        }
     
-    public init(
-        size: CGSize, 
-        dotSize:     @escaping (CGPoint) -> Double, 
-        dotStrength: @escaping (CGPoint) -> Double 
-    ) {
-            self.size = size
-            self.dots = DotGenerator
-                .makeDots(in: size, 
-                          dotSize: dotSize, 
-                          dotStrength: dotStrength)
-        }
-    
-    private static func makeDots(in size:CGSize,
+    static func makeDots(in size:CGSize,
+                                 result: inout [Dot],
                                  dotSize: @escaping (CGPoint) -> Double, 
                                  dotStrength: @escaping (CGPoint) -> Double
-    ) -> [Dot] {
+    )  {
         
         //Do not start in same place
         let aroundMiddle: (CGSize) -> CGPoint = { size in
@@ -42,7 +46,7 @@ public struct DotGenerator {
         let p = aroundMiddle(size)
         let dot = Dot(at: p, zone: dotSize(p), strength: dotStrength(p))
         
-        var result: [Dot] = [dot]
+        
         //make first dots around
         var newDots: [Dot] = dot.addDots(in: size, 
                                          allDots: &result, 
@@ -67,6 +71,5 @@ public struct DotGenerator {
                 newDots = virginDots
             }
         }
-        return result
     }
 }

@@ -8,10 +8,16 @@ import CoreImage
 import AppKit
 
 @MainActor
-public struct FiltersChain {
+public struct FiltersChain: Equatable {
+    
+    nonisolated public static func == (lhs: FiltersChain, rhs: FiltersChain) -> Bool {
+        lhs.chain == rhs.chain
+    }
+    
     enum Errors: Error {
         case filterFailed
     }
+    
     var chain: [Filters]
     func result(source: CIImage) throws -> CIImage {
         var result: CIImage? = source

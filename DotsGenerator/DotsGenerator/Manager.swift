@@ -19,11 +19,11 @@ class Manager : ObservableObject {
     }
     var size: CGSize = CGSize(width: 1024, height: 1024)
     var mainImage: CIImage? = nil
-    var detailMap: MapType = .none(value: 0.5)
+    @Published var detailMap: MapType = .number(value: 0.5)
     var detailDotSize = DotSize(multiplier: 50.0, minSize: 10.0)
-    var strengthMap: MapType = .none(value: 0.6)
+    @Published var strengthMap: MapType = .number(value: 0.6)
     var strengthDotSize = DotSize(multiplier: 0.5, minSize: 0.1)
-    var dots: [Dot] = []
+    @Published var dots: [Dot] = []
     
     
     func updateDots() {

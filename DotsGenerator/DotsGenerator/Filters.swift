@@ -7,7 +7,7 @@
 import CoreImage
 import AppKit
 
-enum Filters: CaseIterable, Identifiable {
+enum Filters: CaseIterable, Identifiable, Equatable {
     typealias ID = String
     
     var id: String {

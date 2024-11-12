@@ -6,7 +6,7 @@
 //
 import AppKit
 struct Defaults {
-    static let chain = FiltersChain(chain: [
+    static let filtersChain = FiltersChain(chain: [
         .morfologyGradient(radius: 8),
         .colorMonochrome(color: NSColor.white, 
                             intensity: 2),
@@ -22,11 +22,15 @@ struct Defaults {
         NSImage(named: "Love")!.ciImage!
     }
     
-    static var map: MapType {
-        //MapType.none(value: 0.5)
-        MapType.image(image: Defaults.ciImage, filters: Defaults.chain)
-//        MapType.function({point in 
-//            return 0.5
-//        })
+    static var defaultMapImage: MapType {
+        MapType.image(image: Defaults.ciImage, filters: Defaults.filtersChain)
+    }
+    static var defaultMapValue: MapType {
+        MapType.number(value: 0.5)
+    }
+    static var defaultMapFunction: MapType {
+        MapType.function({point in 
+            return 0.5
+        })
     }
 }

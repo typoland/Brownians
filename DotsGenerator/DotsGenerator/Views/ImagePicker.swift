@@ -8,6 +8,7 @@ import SwiftUI
 struct ImagePicker: View {
     @Binding var image: CIImage
     @State var isImporting: Bool = false
+    @EnvironmentObject var manger: Manager
     var body: some View {
         VStack {
             
@@ -28,6 +29,7 @@ struct ImagePicker: View {
                     guard let data = try? Data(contentsOf: url) else {return}
                     if let new = NSImage(data: data)?.ciImage {
                         image = new
+                        manger.updateSizes()
                     }
                 case .failure(let error):
                     print(error)

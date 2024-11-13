@@ -29,9 +29,6 @@ enum MapType {
         }
     }
     
-
-    
-    @MainActor 
     func value(at point:CGPoint) throws -> Double {
         switch self {
         case .image(let image, let chain):
@@ -50,5 +47,14 @@ enum MapType {
         case MapTypeNames.function.rawValue: self = Defaults.defaultMapFunction
         default: self = Defaults.defaultMapValue
         }
+    }
+    
+    @MainActor
+    func faltten(to size: CGSize) -> Self {
+        if case .image(let image, let filters) = self {
+            let flatten = (try? filters?.result(source: image)) ?? image.scaleTo(newSize: size)
+            return .image(image: flatten, filters: nil)
+        }
+        return self
     }
 }

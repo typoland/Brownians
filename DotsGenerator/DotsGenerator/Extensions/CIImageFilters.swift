@@ -9,13 +9,14 @@ import CoreImage
 
 
 public extension CIImage {
+
     
     func gaussianBlur(radius: Double) -> CIImage? {
         CIFilter(name:"CIGaussianBlur",
                  parameters: [
                     kCIInputImageKey: self,
                     "inputRadius": NSNumber(value: radius)]
-        )?.outputImage 
+        )?.outputImage?.cropped(to: self.extent) 
     }
     
     func colorClamp(min: NSColor, max: NSColor) -> CIImage? {
@@ -75,6 +76,23 @@ public extension CIImage {
         )?.outputImage 
     }
     
+    func scaleTo (newSize: CGSize) -> CIImage {
+        
+        let scaleX = newSize.width/self.extent.size.width
+        let scaleY = newSize.height/self.extent.size.height
+        return self.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY)) 
+        
+    }
+    
+    func resize(scale: Double, ratio: Double) -> CIImage? {
+        CIFilter(name:"CILanczosScaleTransform",
+                 parameters: [
+                    kCIInputImageKey: self,
+                    kCIInputScaleKey: NSNumber(value: scale),
+                    kCIInputAspectRatioKey: NSNumber(value: scale),
+                 ]
+        )?.outputImage 
+    }
 }
 
 

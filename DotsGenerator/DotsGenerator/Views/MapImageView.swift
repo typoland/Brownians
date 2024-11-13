@@ -9,6 +9,7 @@ import SwiftUI
 struct MapImageView: View {
     @Binding var image: CIImage
     @Binding var filters: FiltersChain?
+   
     var body: some View {
         VStack {
 

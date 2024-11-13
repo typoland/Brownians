@@ -10,16 +10,13 @@ import SwiftUI
 struct MapTypeView: View {
     
     @Binding var map: MapType
-    @State var mapName: String = MapTypeNames.allCases[0].rawValue
+    
     var body: some View {
         VStack {
-            MapTypeChooser(mapName: $mapName)
-                .onChange(of: mapName) {
-                    print ("changed from",map)
-                    print ("new map name",mapName)
-                    map = MapType(mapName)
-                    print ("new map",map)
-                }
+            let nameBinding = Binding(get: {map.name}, 
+                                      set: {map = MapType($0)})
+            MapTypeChooser(mapName: nameBinding)
+                
             
             switch map {
             case .function(let function):

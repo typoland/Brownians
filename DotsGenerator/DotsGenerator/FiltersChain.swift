@@ -7,7 +7,6 @@
 import CoreImage
 import AppKit
 
-@MainActor
 public struct FiltersChain: Equatable {
     
     nonisolated public static func == (lhs: FiltersChain, rhs: FiltersChain) -> Bool {
@@ -31,7 +30,7 @@ public struct FiltersChain: Equatable {
     }
 }
 
-extension FiltersChain: @preconcurrency CustomStringConvertible {
+extension FiltersChain: CustomStringConvertible {
     public var description: String {
         "\(chain.count) filters"
     }

@@ -16,7 +16,7 @@ public final class Dot: Sendable {
     public var at: CGPoint
     public let lowerBound : Double
     public let upperBound : Double
-    public let strength : Double
+    public let dotSize : Double
     
     public var neighbors: [CGPoint] = []
     private var isFull: Bool = false
@@ -30,11 +30,12 @@ public final class Dot: Sendable {
     public var randomInZoneCircle: GeometricCircle  {
         GeometricCircle(at: at, radius: Double.random(in: zone))
     } 
-    public init(at: CGPoint, zone: Double, strength: Double) {
+    
+    public init(at: CGPoint, density: Double, dotSize: Double, chaos: Double = 0.7) {
         self.at = at
-        self.lowerBound = 0.7 * zone //0.7 is OK
-        self.upperBound = zone
-        self.strength = strength
+        self.lowerBound = chaos * density //0.7 is OK
+        self.upperBound = density
+        self.dotSize = dotSize
     }
     
     public enum ZoneSide: CaseIterable {
@@ -47,6 +48,7 @@ public final class Dot: Sendable {
         
         let  distanceToSelf =  zone.contains( point |-| at )
         //print ("\t\tSelf:", distanceToSelf, (zone/2...zone) , point |-| at)
+        
         let  distanceToDot =  zone.contains( point |-| dot.at )
         //print ("\t\t Dot:", distanceToDot, (dot.zone/2...dot.zone) , point |-| dot.at)
         let side = point.onSide(of: at, and: dot.at)
@@ -75,9 +77,11 @@ public final class Dot: Sendable {
     
     
     func addDots(in size: CGSize, 
-                        allDots: inout [Dot], 
-                        zoneClosure: (CGPoint) -> Double = {_ in 50.0},
-                        strengthClosure:(CGPoint) -> Double = {_ in 0.5}) -> [Dot]  {
+                 allDots: inout [Dot], 
+                 density: (CGPoint) -> Double = {_ in 50.0},
+                 dotSize:(CGPoint) -> Double = {_ in 0.5},
+                 chaos: Double
+    ) -> [Dot]  {
         //CHECK ZONES
         //var childDots: [Dot] = []
         var dotsAround = allDots.filter {dot in
@@ -91,8 +95,9 @@ public final class Dot: Sendable {
             let distance = Double.random(in: zone)
             let `where` = at.offset(angle: angle, distance: distance)
             let newDot = Dot(at: `where`, 
-                             zone: zoneClosure(`where`),
-                             strength: strengthClosure(`where`))
+                             density: density(`where`),
+                             dotSize: dotSize(`where`),
+                             chaos: chaos)
             dotsAround.append(newDot)
             allDots.append(newDot)
         } 
@@ -104,13 +109,16 @@ public final class Dot: Sendable {
              search: for dot in dotsAround {
 
                     if case .points(let up, _) = randomInZoneCircle * dot.randomInZoneCircle {
-                        let otherDots = dotsAround.filter({$0.at != dot.at}) 
+                        let otherDots = dotsAround//.filter({$0.at != dot.at}) 
                             
                         let inZoneOfOtherDots = otherDots.reduce(into: false, {$0 = $0 || $1.innerCircle.contains(up)}) 
                         let inFrame = (0...size.width).contains(up.x) && (0...size.height).contains(up.y)
                         
                         if zoneIsEmpty(with: dot, for: up, on: .up, of: dotsAround) && !inZoneOfOtherDots && inFrame {
-                            let newDot = Dot(at: up, zone: zoneClosure(up), strength: strengthClosure(up))
+                            let newDot = Dot(at: up, 
+                                             density: density(up), 
+                                             dotSize: dotSize(up),
+                                             chaos: chaos)
                             allDots.append(newDot)
                             dotsAround.append(newDot)
                             newDots.append(newDot)

@@ -7,41 +7,92 @@
 import Foundation
 import CoreImage
 
+
 @MainActor
 class Manager : ObservableObject {
+    enum SizeOwner {
+        case manager
+        case detailMap
+        case sizeMap
+    }
     
     struct DotSize {
-        var multiplier: Double
+        var maxSize: Double
         var minSize: Double
-        static func * (lhs: Self, rhs: Double) -> Double{
-            rhs * lhs.multiplier + lhs.minSize
+        static func * (lhs: Self, rhs: Double) -> Double {
+            (lhs.maxSize-lhs.minSize) * rhs + lhs.minSize //lerp
+            //(rhs + lhs.minSize) * lhs.maxSize + lhs.minSize
         }
     }
-    var size: CGSize = CGSize(width: 1024, height: 1024)
-    var mainImage: CIImage? = nil
-    @Published var detailMap: MapType = .number(value: 0.5)
-    var detailDotSize = DotSize(multiplier: 50.0, minSize: 10.0)
-    @Published var strengthMap: MapType = .number(value: 0.6)
-    var strengthDotSize = DotSize(multiplier: 0.5, minSize: 0.1)
+    
+    @Published var sizeOwner: SizeOwner = .manager
+    
+    @Published var size: CGSize = CGSize(width: 1024, height: 1024)
+    
+    @Published var detailMap: MapType = Defaults.defaultMapImage
+    
+    
+    @Published var sizeMap: MapType = Defaults.defaultMapImage
+    
+    @Published var detailSize = DotSize(maxSize: 6, minSize: 4)
+    @Published var dotSize = DotSize(maxSize: 0.7, minSize: 0.2)
+    
     @Published var dots: [Dot] = []
     
+    @Published var chaos: Double = 0.7
     
-    func updateDots() {
-        
-        let imageDotSize: (CGPoint) -> Double =  { point in
-            let gray = (try? self.detailMap.value(at: point)) ?? 0.5
-            return self.detailDotSize * gray
-        }
-        let imageDotStrength: (CGPoint) -> Double =  { point in
-            let gray = (try? self.strengthMap.value(at: point)) ?? 0.5
-            return self.strengthDotSize * gray
-        }
-        
-        DotGenerator.makeDots(in: size, 
-                              result: &dots,
-                              dotSize: imageDotSize, 
-                              dotStrength: imageDotStrength)
+    func mapValue(at point: CGPoint, in map: MapType, for sizes: DotSize) -> Double {
+        let gray = 1.0 - ((try? map.value(at: point)) ?? 0.5)
+        return sizes * gray
     }
     
+    func updateSizes() {
+        
+
+        
+        switch sizeOwner {
+        case .manager:
+            _ = self.size
+        case .detailMap:
+            if case .image(let image, _) = detailMap {
+                self.size = image.extent.size
+            } else {
+                //_self.size = self.size
+                sizeOwner = .manager
+            }
+        case .sizeMap:
+            if case .image(let image, _) = sizeMap {
+                self.size = image.extent.size
+            } else {
+                //newSize = self.size
+                sizeOwner = .manager
+            }
+        }
+        //Scale others
+    }
+    
+    
+    func updateDots(in size: CGSize) async {
+        dots = []
+       print ("Update Dots!")
+        let detailMap = detailMap.faltten(to: size)
+        let sizeMap = sizeMap.faltten(to: size)
+        let dotSize = self.dotSize
+        let detailSize = self.detailSize
+        Task {
+             DotGenerator
+                .makeDots(in:  size, 
+                          result: &dots,
+                          detailSize: {self.mapValue(at: $0, 
+                                                     in: detailMap,
+                                                     for: detailSize)}, 
+                          dotSize: {self.mapValue(at: $0, 
+                                                  in: sizeMap,
+                                                  for: dotSize)}, 
+                          chaos: chaos)
+        }
+    }
+    
+   
     
 }

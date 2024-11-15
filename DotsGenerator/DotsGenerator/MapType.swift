@@ -24,8 +24,8 @@ enum MapTypeNames: String, CaseIterable {
 
 enum MapType {
     
-    case image(image: CIImage, filters: FiltersChain?, dotSize: DotSize)
-    case function(Functions, dotSize: DotSize)
+    case image(image: CIImage, filters: FiltersChain?)
+    case function(Functions)
     case number(value: CGFloat)
     
     var name: String {
@@ -41,11 +41,10 @@ enum MapType {
     
     func value(at point:CGPoint, in size: CGSize) -> Double {
         switch self {
-        case .image(let image, let chain, let dotSize):
-            let gray = (try? chain?.result(source: image) ?? image)?.pixelColor(at: point).grayValue ?? 0.5
-            return dotSize * gray
-        case .function(let function, let dotSize):
-            return dotSize * function.inSize(size)(point)
+        case .image(let image, let chain):
+            return (try? chain?.result(source: image) ?? image)?.pixelColor(at: point).grayValue ?? 0.5
+        case .function(let function):
+            return function.inSize(size)(point)
         case .number(let value):
             return value
         }
@@ -61,9 +60,9 @@ enum MapType {
     
     @MainActor
     func faltten(to size: CGSize) -> Self {
-        if case .image(let image, let filters, let dotSize) = self {
+        if case .image(let image, let filters) = self {
             let flatten = (try? filters?.result(source: image)) ?? image.scaleTo(newSize: size)
-            return .image(image: flatten, filters: nil, dotSize: dotSize)
+            return .image(image: flatten, filters: nil)
         }
         return self
     }
@@ -72,10 +71,10 @@ enum MapType {
 extension MapType: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
-        case .image(let image, let filters, let dotSize):
-            return "Image \(image) \(filters); Dot Sizes: \(dotSize)"
-        case .function(let functions, let dotSize):
-            return "Fuction \(functions); Dot Sizes: \(dotSize)"
+        case .image(let image, let filters):
+            return "Image \(image) \(filters == nil ? "0" : "\(filters!.chain.count) filters")"
+        case .function(let functions):
+            return "Fuction \(functions)"
         case .number(let value):
             return "Number \(value)"
         }

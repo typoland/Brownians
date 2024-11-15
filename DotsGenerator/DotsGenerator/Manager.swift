@@ -26,19 +26,31 @@ class Manager : ObservableObject {
     
     @Published var sizeMap: MapType = Defaults.defaultMapImage
     
-    //@Published var detailSize = DotSize(maxSize: 6, minSize: 4)
-    //@Published var dotSize = DotSize(maxSize: 0.7, minSize: 0.2)
+    @Published var detailSize = DotSize(minSize: 4, maxSize: 6)
+    @Published var dotSize = DotSize(minSize: 0.2, maxSize: 0.7)
     
     @Published var dots: [Dot] = []
     
     @Published var chaos: Double = 0.7
     
-    func mapValue(at point: CGPoint, 
-                  in map: MapType
-                  ) -> Double {
-        
-        return (map.value(at: point, in: size)) 
+    func mapValue(map: MapType, dotSize: DotSize) -> (CGPoint, CGSize) -> Double {
+        return {point, size in
+            dotSize * map.value(at: point, in: size) 
+        }
     }
+    
+    func det() -> (CGPoint, CGSize) -> Double {
+        mapValue(map: detailMap, dotSize: detailSize)
+    }
+    func siz() -> (CGPoint, CGSize) -> Double {
+        mapValue(map: sizeMap, dotSize: dotSize)
+    }
+//    func mapValue(at point: CGPoint, 
+//                  in map: MapType
+//                  ) -> Double {
+//        
+//        return (map.value(at: point, in: size)) 
+//    }
     
     func updateSizes() {
         
@@ -48,14 +60,14 @@ class Manager : ObservableObject {
         case .manager:
             _ = self.size
         case .detailMap:
-            if case .image(let image, _, _) = detailMap {
+            if case .image(let image, _) = detailMap {
                 self.size = image.extent.size
             } else {
                 //_self.size = self.size
                 sizeOwner = .manager
             }
         case .sizeMap:
-            if case .image(let image, _, _) = sizeMap {
+            if case .image(let image, _) = sizeMap {
                 self.size = image.extent.size
             } else {
                 //newSize = self.size
@@ -78,8 +90,8 @@ class Manager : ObservableObject {
             await generator
                 .makeDotsTask(in:  size, 
                           //result: &dots,
-                          detailSize: detailMap, 
-                          dotSize: sizeMap, 
+                          detailMap: det(), 
+                          dotSizeMap: siz(), 
                           chaos: chaos)
         }
     }

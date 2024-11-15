@@ -44,11 +44,11 @@ struct ContentView: View {
                 HStack (alignment: .top) {
                     MapTypeView(title: "Detail size",
                                 map: $manager.detailMap, 
-                                //size: $manager.detailSize,
+                                dotSize: $manager.detailSize,
                                 range: 2...Double.infinity)
                     MapTypeView(title: "Dot size",
                                 map: $manager.sizeMap, 
-                               // size: $manager.dotSize,
+                                dotSize: $manager.dotSize,
                                 range: 0...Double.infinity)
                     
                     

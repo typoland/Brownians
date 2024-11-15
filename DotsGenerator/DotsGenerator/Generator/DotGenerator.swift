@@ -31,8 +31,8 @@ actor DotGenerator {
     
     func makeDotsTask(in size: CGSize,
                       //result: inout [Dot],
-                      detailSize: MapType,//@escaping (CGPoint) -> Double, 
-                      dotSize: MapType, //@escaping (CGPoint) -> Double,
+                      detailMap: @escaping (CGPoint, CGSize) -> Double, 
+                      dotSizeMap: @escaping (CGPoint, CGSize) -> Double,
                       chaos: Double ) async 
     
     -> Task<[Dot], Never>  
@@ -43,22 +43,22 @@ actor DotGenerator {
             //Do not start in same place
             let aroundMiddle: (CGSize) -> CGPoint = { size in
                 let center = CGPoint(x: size.width/2, y: size.height/2)
-                let r = abs(detailSize.value(at: center, in: size))
+                let r = abs(detailMap(center, size))
                 return center + CGPoint(x: Double.random(in: -r...r),
                                         y: Double.random(in: -r...r))
             }
             //first dot somewhere in a middle
             let p = aroundMiddle(size)
             let dot = Dot(at: p, 
-                          density: detailSize.value(at: p, in: size), 
-                          dotSize: dotSize.value(at: p, in: size))
+                          density: detailMap( p, size), 
+                          dotSize: dotSizeMap( p, size))
             dots = [dot]
             
             //make first dots around
             var newDots: [Dot] = await dot.addDots(in: size, 
                                                    generator: self, 
-                                                   density: detailSize,
-                                                   dotSize: dotSize,
+                                                   density: detailMap,
+                                                   dotSize: dotSizeMap,
                                                    chaos: chaos)
             
             var virginDots: [Dot] = []
@@ -72,8 +72,8 @@ actor DotGenerator {
                         //                autoreleasepool {
                         let z = await newDot.addDots(in: size, 
                                                      generator: self,
-                                                     density: detailSize,
-                                                     dotSize: dotSize,
+                                                     density: detailMap,
+                                                     dotSize: dotSizeMap,
                                                      chaos: chaos)
                         virginDots.append(contentsOf: z)
                     }

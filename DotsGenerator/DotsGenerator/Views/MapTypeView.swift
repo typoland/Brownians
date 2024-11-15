@@ -10,10 +10,11 @@ import SwiftUI
 struct MapTypeView: View {
     var title: String
     @Binding var map: MapType
-    //@Binding var size: Manager.DotSize
+    @Binding var dotSize: DotSize
     var range: ClosedRange<Double>
     var body: some View {
         VStack {
+           
             
             Text(title)
             let nameBinding = Binding(
@@ -24,38 +25,25 @@ struct MapTypeView: View {
             
             
             switch map {
-            case .function(let function, 
-                           let dotSize):
-                let sizesBinding = Binding(
-                    get: {dotSize},
-                    set: {map = .function(function, 
-                                          dotSize: $0)
-                })
-                SizesView(dotSize: sizesBinding, range: range)
+            case .function(let function):
+                
+                SizesView(dotSize: $dotSize, range: range)
                 MapFunctionView(function: function)
                 
             case .image(let image, 
-                        let filtersChain, 
-                        let dotSizes):
-                let sizesBinding = Binding(
-                    get: {dotSizes},
-                    set: {map = .image(image: image, 
-                                     filters: filtersChain, 
-                                     dotSize: $0)
-                    })
-                SizesView(dotSize: sizesBinding, 
+                        let filtersChain):
+                
+                SizesView(dotSize: $dotSize, 
                           range: range)
                 
                 let bindingChain = Binding(
                     get: {filtersChain}, 
                     set: {map = .image(image: image, 
-                                       filters: $0, 
-                                       dotSize: dotSizes)})
+                                       filters: $0)})
                 let bindingImage = Binding(
                     get: {image}, 
                     set: {map = .image(image: $0, 
-                                       filters: filtersChain,
-                                       dotSize: dotSizes)})
+                                       filters: filtersChain)})
                 MapImageView(image: bindingImage, 
                              filters: bindingChain)
             case .number(value: let value):
@@ -73,11 +61,10 @@ struct MapTypeView: View {
     @Previewable @State var v = MapType.number(value: 0.5)
     @Previewable @State var i = MapType
         .image(image: Defaults.ciImage, 
-               filters: Defaults.filtersChain,
-               dotSize: DotSize(minSize: 4, maxSize: 10))
+               filters: Defaults.filtersChain)
     @Previewable @State var f = MapType.number(value: 0.5)
-//    @Previewable @State var size = Manager.DotSize(maxSize: 10, minSize: 30)
-    MapTypeView(title: "test",map: $i, range: 0...1000)
+    @Previewable @State var size = DotSize(minSize: 10, maxSize: 20)
+    MapTypeView(title: "test",map: $i, dotSize: $size, range: 0...1000)
 }
 
 struct SizesView: View {

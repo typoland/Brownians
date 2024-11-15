@@ -59,12 +59,12 @@ struct DotSizesView: View {
     
     func start(in size: CGSize) async {
        
-  
+       
         generatorTask = await generator
             .makeDotsTask(in: size, 
                       //result: &dots, 
-                          detailSize: manager.detailMap, 
-                          dotSize: manager.sizeMap,
+                          detailMap: manager.det() , 
+                          dotSizeMap: manager.siz(),
                       chaos: manager.chaos)
         dots =  await generatorTask.value
         refresh = false 
@@ -105,10 +105,19 @@ struct DotSizesView: View {
                         }
                     }
             }
-            if refresh {
-                Button("Stop") {
-                   generatorTask.cancel()
-                   refresh = false
+            HStack {
+                if refresh {
+                    Button("Stop") {
+                        generatorTask.cancel()
+                        refresh = false
+                    }
+                }
+                if refresh {
+                    Button("Look") {
+                        Task {
+                            dots = await generator.currentDots()
+                        }
+                    }
                 }
             }
         }

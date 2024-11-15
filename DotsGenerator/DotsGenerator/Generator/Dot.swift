@@ -80,8 +80,8 @@ public final actor Dot: Sendable {
     
     func addDots(in size: CGSize, 
                  generator: DotGenerator, 
-                 density: MapType,
-                 dotSize: MapType,
+                 density: (CGPoint, CGSize) -> Double,
+                 dotSize: (CGPoint, CGSize) -> Double,
                  chaos: Double
     ) async -> [Dot]  {
         //CHECK ZONES
@@ -95,8 +95,8 @@ public final actor Dot: Sendable {
             let distance = Double.random(in: zone)
             let `where` = at.offset(angle: angle, distance: distance)
             let newDot = Dot(at: `where`, 
-                             density: density.value(at: `where`, in: size),
-                             dotSize: dotSize.value(at: `where`, in: size),
+                             density: density(`where` , size),
+                             dotSize: dotSize( `where`, size),
                              chaos: chaos)
             dotsAround.append(newDot)
             await generator.addDot(newDot)
@@ -129,8 +129,8 @@ public final actor Dot: Sendable {
                      let inZoneOfOtherDots = await thisDotTouches(otherDots)
                         if zoneIsEmpty(with: dot, for: up, on: .up, of: dotsAround) && !inZoneOfOtherDots && inFrame {
                             let newDot = Dot(at: up, 
-                                             density: density.value(at: up, in: size), 
-                                             dotSize: dotSize.value(at: up, in: size),
+                                             density: density(up, size), 
+                                             dotSize: dotSize(up, size),
                                              chaos: chaos)
                             await generator.addDot(newDot)
                             dotsAround.append(newDot)

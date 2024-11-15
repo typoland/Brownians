@@ -23,13 +23,12 @@ struct Defaults {
     }
     
     static var defaultMapImage: MapType {
-        MapType.image(image: Defaults.ciImage, filters: nil, dotSize: DotSize(minSize: 10, maxSize: 20))
+        MapType.image(image: Defaults.ciImage, filters: nil)
     }
     static var defaultMapValue: MapType {
         MapType.number(value: 0.5)
     }
     static var defaultMapFunction: MapType {
-        MapType.function(.horizontalBlend, 
-                         dotSize: DotSize(minSize: 5, maxSize: 10))
+        MapType.function(.horizontalBlend)
     }
 }

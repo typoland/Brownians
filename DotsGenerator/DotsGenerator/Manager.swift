@@ -81,7 +81,7 @@ class Manager : ObservableObject {
         let generator = DotGenerator()
         Task {
             await generator
-                .makeDots(in:  size, 
+                .makeDotsTask(in:  size, 
                           //result: &dots,
                           detailSize: {self.mapValue(at: $0, 
                                                      in: detailMap,

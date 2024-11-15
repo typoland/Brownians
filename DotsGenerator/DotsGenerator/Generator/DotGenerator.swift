@@ -7,40 +7,34 @@
 
 import Foundation
 import AppKit
+import Combine
 
-
+//let updateGeneratorDots = PassthroughSubject<[Dot], Never>()
 
 actor DotGenerator {
-    
-    enum Errors: Error {
-        
-        case success(with: [Dot])
-        case failure(with: [Dot])
-    }
-    
+    @MainActor
+    let updateGeneratorDots = PassthroughSubject<Void, Never>()
     func addDot(_ dot:Dot) async {
         dots.append(dot)
     }
     var dots: [Dot] = []
-//    var run: Bool = true
-    func stop() {
-        let t : Task<[Dot], Errors>  //= Task(operation: {[]})         
+    
+    @MainActor
+    func sendTemporaryResult() {
+        updateGeneratorDots.send()
     }
     
-
-    
-    func makeDots(in size: CGSize,
-                         //result: inout [Dot],
-                         detailSize: @escaping (CGPoint) -> Double, 
-                         dotSize: @escaping (CGPoint) -> Double,
-                         chaos: Double ) async 
+    func makeDotsTask(in size: CGSize,
+                      //result: inout [Dot],
+                      detailSize: @escaping (CGPoint) -> Double, 
+                      dotSize: @escaping (CGPoint) -> Double,
+                      chaos: Double ) async 
     
     -> Task<[Dot], Never>  
     
     {
-        var counter = 0
+        var generationNr = 0
         return Task { () -> [Dot] in
-//            run = true
             //Do not start in same place
             let aroundMiddle: (CGSize) -> CGPoint = { size in
                 let center = CGPoint(x: size.width/2, y: size.height/2)
@@ -48,11 +42,10 @@ actor DotGenerator {
                 return center + CGPoint(x: Double.random(in: -r...r),
                                         y: Double.random(in: -r...r))
             }
-            print ("making dots in size:", size)
             //first dot somewhere in a middle
             let p = aroundMiddle(size)
             let dot = Dot(at: p, density: detailSize(p), dotSize: dotSize(p))
-            dots = []
+            dots = [dot]
             
             //make first dots around
             var newDots: [Dot] = await dot.addDots(in: size, 
@@ -62,11 +55,7 @@ actor DotGenerator {
                                                    chaos: chaos)
             
             var virginDots: [Dot] = []
-            
-            
-            //reprat until all dots in frame
-//            print (!newDots.isEmpty, !(newDots.isEmpty && run))
-            //let dotTask = Task {() -> Void in
+
             do {
                 while !(newDots.isEmpty) {
                     try Task.checkCancellation()
@@ -82,17 +71,18 @@ actor DotGenerator {
                         virginDots.append(contentsOf: z)
                     }
                     newDots = virginDots
-                    print ("\(dots.count) dots counted in \(counter) generations")
-                    counter += 1
+                    //print ("\(dots.count) dots counted in \(counter) generations")
+                    generationNr += 1
+                    await sendTemporaryResult()
                     // }
                 }
             } catch {
-                print ("Generator Canceled at \(counter)")
-//                run = false
+//                print ("Generator Canceled at \(counter)")
                 return dots
             }
-
-            print ("Generator At the end Done")
+#if DEBUG
+            print ("Generator At the end Done \(dots.count) in \(generationNr) generations")
+#endif
 //            run = false
             return dots
             

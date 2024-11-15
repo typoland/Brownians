@@ -164,7 +164,7 @@ public extension CIImage {
             sum[2] += Double(buf.array[i+2])/255.0
         } 
         let res = sum.map{$0/(Double(buf.array.count) / componentLength)}
-        print (res)
+       
         return NSColor(red: res[0], green: res[1], blue: res[2], alpha: 1)
     }
 }

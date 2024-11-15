@@ -16,14 +16,7 @@ class Manager : ObservableObject {
         case sizeMap
     }
     
-    struct DotSize {
-        var maxSize: Double
-        var minSize: Double
-        static func * (lhs: Self, rhs: Double) -> Double {
-            (lhs.maxSize-lhs.minSize) * rhs + lhs.minSize //lerp
-            //(rhs + lhs.minSize) * lhs.maxSize + lhs.minSize
-        }
-    }
+    
     
     @Published var sizeOwner: SizeOwner = .manager
     
@@ -33,16 +26,18 @@ class Manager : ObservableObject {
     
     @Published var sizeMap: MapType = Defaults.defaultMapImage
     
-    @Published var detailSize = DotSize(maxSize: 6, minSize: 4)
-    @Published var dotSize = DotSize(maxSize: 0.7, minSize: 0.2)
+    //@Published var detailSize = DotSize(maxSize: 6, minSize: 4)
+    //@Published var dotSize = DotSize(maxSize: 0.7, minSize: 0.2)
     
     @Published var dots: [Dot] = []
     
     @Published var chaos: Double = 0.7
     
-    func mapValue(at point: CGPoint, in map: MapType, for sizes: DotSize) -> Double {
-        let gray = 1.0 - ((try? map.value(at: point)) ?? 0.5)
-        return sizes * gray
+    func mapValue(at point: CGPoint, 
+                  in map: MapType
+                  ) -> Double {
+        
+        return (map.value(at: point, in: size)) 
     }
     
     func updateSizes() {
@@ -53,14 +48,14 @@ class Manager : ObservableObject {
         case .manager:
             _ = self.size
         case .detailMap:
-            if case .image(let image, _) = detailMap {
+            if case .image(let image, _, _) = detailMap {
                 self.size = image.extent.size
             } else {
                 //_self.size = self.size
                 sizeOwner = .manager
             }
         case .sizeMap:
-            if case .image(let image, _) = sizeMap {
+            if case .image(let image, _, _) = sizeMap {
                 self.size = image.extent.size
             } else {
                 //newSize = self.size
@@ -76,19 +71,15 @@ class Manager : ObservableObject {
        print ("Update Dots!")
         let detailMap = detailMap.faltten(to: size)
         let sizeMap = sizeMap.faltten(to: size)
-        let dotSize = self.dotSize
-        let detailSize = self.detailSize
+//        let dotSize = self.dotSize
+//        let detailSize = self.detailSize
         let generator = DotGenerator()
         Task {
             await generator
                 .makeDotsTask(in:  size, 
                           //result: &dots,
-                          detailSize: {self.mapValue(at: $0, 
-                                                     in: detailMap,
-                                                     for: detailSize)}, 
-                          dotSize: {self.mapValue(at: $0, 
-                                                  in: sizeMap,
-                                                  for: dotSize)}, 
+                          detailSize: detailMap, 
+                          dotSize: sizeMap, 
                           chaos: chaos)
         }
     }

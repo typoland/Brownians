@@ -14,8 +14,13 @@ import Combine
 actor DotGenerator {
     @MainActor
     let updateGeneratorDots = PassthroughSubject<Void, Never>()
+    
     func addDot(_ dot:Dot) async {
         dots.append(dot)
+    }
+    @MainActor
+    func currentDots() async -> [Dot] {
+        await dots
     }
     var dots: [Dot] = []
     
@@ -26,8 +31,8 @@ actor DotGenerator {
     
     func makeDotsTask(in size: CGSize,
                       //result: inout [Dot],
-                      detailSize: @escaping (CGPoint) -> Double, 
-                      dotSize: @escaping (CGPoint) -> Double,
+                      detailSize: MapType,//@escaping (CGPoint) -> Double, 
+                      dotSize: MapType, //@escaping (CGPoint) -> Double,
                       chaos: Double ) async 
     
     -> Task<[Dot], Never>  
@@ -38,13 +43,15 @@ actor DotGenerator {
             //Do not start in same place
             let aroundMiddle: (CGSize) -> CGPoint = { size in
                 let center = CGPoint(x: size.width/2, y: size.height/2)
-                let r = detailSize(center)
+                let r = abs(detailSize.value(at: center, in: size))
                 return center + CGPoint(x: Double.random(in: -r...r),
                                         y: Double.random(in: -r...r))
             }
             //first dot somewhere in a middle
             let p = aroundMiddle(size)
-            let dot = Dot(at: p, density: detailSize(p), dotSize: dotSize(p))
+            let dot = Dot(at: p, 
+                          density: detailSize.value(at: p, in: size), 
+                          dotSize: dotSize.value(at: p, in: size))
             dots = [dot]
             
             //make first dots around
@@ -71,14 +78,12 @@ actor DotGenerator {
                         virginDots.append(contentsOf: z)
                     }
                     newDots = virginDots
-                    //print ("\(dots.count) dots counted in \(counter) generations")
                     generationNr += 1
                     await sendTemporaryResult()
                     // }
                 }
             } catch {
-//                print ("Generator Canceled at \(counter)")
-                return dots
+              return dots
             }
 #if DEBUG
             print ("Generator At the end Done \(dots.count) in \(generationNr) generations")

@@ -27,27 +27,44 @@ struct DotSizesView: View {
     @EnvironmentObject var manager: Manager
     @State var dots: [Dot] = []
     //@State var isRunning: Bool = true
+//    var detailMap: (CGSize) -> MapType
+//    var dotSizeMap: (CGSize) -> MapType
     var generator = DotGenerator()
     @State var generatorTask : Task<[Dot], Never> = Task {[]}
     
     //let previewSize: CGSize = CGSize(width: 100, height: 100)
     
-    var detailSize: (Manager, CGSize) -> (CGPoint) -> Double = {manager, frame in
-        { point in
-        manager.detailSize * (1.0-point.x/frame.width)}
-    }
+//    var detailSize: (MapType, CGSize) -> (CGPoint) -> Double = {manager, frame in
+//        { point in
+//        manager.detailSize * (1.0-point.x/frame.width)}
+//    }
+//    
+//    var dotSize:(MapType, CGSize) -> (CGPoint) -> Double = {manager, frame in
+//        {point in manager.dotSize * (1.0-point.y/frame.height)}
+//    }
+
     
-    var dotSize:(Manager, CGSize) -> (CGPoint) -> Double = {manager, frame in
-        {point in manager.dotSize * (1.0-point.y/frame.height)}
-    }
+//    var detailMap: (CGSize) -> MapType  = { size in
+//        return .function(
+//            Functions.verticalBlend,
+//            dotSize: DotSize(minSize: 6, maxSize: 10))
+//        
+//    }
+//    var dotSizeMap: (CGSize) -> MapType = { size in
+//        return .function(
+//            Functions.horizontalBlend,
+//            dotSize: DotSize(minSize: 0.1, maxSize: 0.9))
+//        
+//    }
     
     func start(in size: CGSize) async {
-        
+       
+  
         generatorTask = await generator
             .makeDotsTask(in: size, 
                       //result: &dots, 
-                      detailSize: detailSize(manager, size), 
-                      dotSize: dotSize(manager, size),
+                          detailSize: manager.detailMap, 
+                          dotSize: manager.sizeMap,
                       chaos: manager.chaos)
         dots =  await generatorTask.value
         refresh = false 
@@ -56,9 +73,7 @@ struct DotSizesView: View {
     var body: some View {
         ZStack {
             GeometryReader {proxy in
-                Canvas {context, size in
-                    print ("context \(size)")
-                    
+                Canvas {context, size in                    
                     for dotIndex in 0..<dots.count {
                         let dot = dots[dotIndex]
                         let circleSize = dot.upperBound * dot.dotSize
@@ -84,9 +99,10 @@ struct DotSizesView: View {
                             }
                         }
                     }
-                    .onReceive(generator.updateGeneratorDots) {whay in
-                        print (whay)
-                        self.dots = generator.dots
+                    .onReceive(generator.updateGeneratorDots) {_ in
+                        Task {
+                            self.dots = await generator.currentDots()
+                        }
                     }
             }
             if refresh {

@@ -31,7 +31,11 @@ public final actor Dot: Sendable {
         GeometricCircle(at: at, radius: Double.random(in: zone))
     } 
     
-    public init(at: CGPoint, density: Double, dotSize: Double, chaos: Double = 0.7) {
+    public init(at: CGPoint, 
+                density: Double, 
+                dotSize: Double, 
+                chaos: Double = 0.7) {
+        
         self.at = at
         self.lowerBound = chaos * density //0.7 is OK
         self.upperBound = density
@@ -47,10 +51,9 @@ public final actor Dot: Sendable {
     public func commonZone(with dot: Dot, contains point:CGPoint) -> ZoneSide {
         
         let  distanceToSelf =  zone.contains( point |-| at )
-        //print ("\t\tSelf:", distanceToSelf, (zone/2...zone) , point |-| at)
         
         let  distanceToDot =  zone.contains( point |-| dot.at )
-        //print ("\t\t Dot:", distanceToDot, (dot.zone/2...dot.zone) , point |-| dot.at)
+
         let side = point.onSide(of: at, and: dot.at)
         return distanceToSelf && distanceToDot  ? 
         side : .none
@@ -63,42 +66,37 @@ public final actor Dot: Sendable {
         
         if let index = dotsAround.firstIndex(where: {dot.at == $0.at}) {
             otherDots.remove(at: index)
-         //   print ("removed \(index)")
         }
         
-        //print ("other dots", otherDots.count)
         for otherDot in otherDots {
             if commonZone(with: dot, contains: otherDot.at) == side {
                 //print ("Zone of \(self) and \(dot) is busy on \(side)")
                 return false
             }
         }
-        //print ("zone is empty on \(side)")
         return true
     }
     
     
     func addDots(in size: CGSize, 
                  generator: DotGenerator, 
-                 density: (CGPoint) -> Double = {_ in 50.0},
-                 dotSize:(CGPoint) -> Double = {_ in 0.5},
+                 density: MapType,
+                 dotSize: MapType,
                  chaos: Double
     ) async -> [Dot]  {
         //CHECK ZONES
-        //var childDots: [Dot] = []
         var dotsAround = await generator.dots.filter {dot in
             (dot.at |-| at) < (upperBound * lowerBound) && dot.at != at //&& !isFull
         }
         var newDots: [Dot] = []
-        //print ("dots around:",dotsAround.count)
         //ADD first dot
         if dotsAround.isEmpty {
             let angle = Double.random(in: 0...Double.tau)
             let distance = Double.random(in: zone)
             let `where` = at.offset(angle: angle, distance: distance)
             let newDot = Dot(at: `where`, 
-                             density: density(`where`),
-                             dotSize: dotSize(`where`),
+                             density: density.value(at: `where`, in: size),
+                             dotSize: dotSize.value(at: `where`, in: size),
                              chaos: chaos)
             dotsAround.append(newDot)
             await generator.addDot(newDot)
@@ -131,8 +129,8 @@ public final actor Dot: Sendable {
                      let inZoneOfOtherDots = await thisDotTouches(otherDots)
                         if zoneIsEmpty(with: dot, for: up, on: .up, of: dotsAround) && !inZoneOfOtherDots && inFrame {
                             let newDot = Dot(at: up, 
-                                             density: density(up), 
-                                             dotSize: dotSize(up),
+                                             density: density.value(at: up, in: size), 
+                                             dotSize: dotSize.value(at: up, in: size),
                                              chaos: chaos)
                             await generator.addDot(newDot)
                             dotsAround.append(newDot)

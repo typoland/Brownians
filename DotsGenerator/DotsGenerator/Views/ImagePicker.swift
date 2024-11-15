@@ -25,7 +25,6 @@ struct ImagePicker: View {
                 switch result {
                 case .success(let url):
                     // url contains the URL of the chosen file.
-                    print (url)
                     guard let data = try? Data(contentsOf: url) else {return}
                     if let new = NSImage(data: data)?.ciImage {
                         image = new

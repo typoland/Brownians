@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct MapFunctionView: View {
-    var function: (CGPoint) -> Double
+    var function: Functions
     var body: some View {
         Text("\(String(describing: function))")
     }

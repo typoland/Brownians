@@ -23,19 +23,32 @@ struct ContentView: View {
                     ImageSizeView(size: $manager.size)
                 }
                 
+//                var detailMap: (CGSize) -> MapType  = { size in
+//                    return .function(
+//                        Functions.verticalBlend,
+//                        dotSize: DotSize(maxSize: 10, minSize: 6))
+//                    
+//                }
+//                var dotSizeMap: (CGSize) -> MapType = { size in
+//                    return .function(
+//                        Functions.horizontalBlend,
+//                        dotSize: DotSize(maxSize: 10, minSize: 6))
+//                    
+//                }
+                
                 DotSizesView(refresh: $refreshPreview)
-                    .frame(height: 180)
+                    .frame(height: 500)
                 
                 
                 
                 HStack (alignment: .top) {
                     MapTypeView(title: "Detail size",
                                 map: $manager.detailMap, 
-                                size: $manager.detailSize,
+                                //size: $manager.detailSize,
                                 range: 2...Double.infinity)
                     MapTypeView(title: "Dot size",
                                 map: $manager.sizeMap, 
-                                size: $manager.dotSize,
+                               // size: $manager.dotSize,
                                 range: 0...Double.infinity)
                     
                     
@@ -44,7 +57,7 @@ struct ContentView: View {
                 Spacer()
             }.onSubmit {
                 refreshPreview = true
-            }.frame(width: 300)
+            }.frame(width: 500)
             .environmentObject(manager)
             
             /*

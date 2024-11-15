@@ -6,7 +6,15 @@
 //
 import CoreImage
 
-
+struct DotSize {
+    var minSize: Double
+    var maxSize: Double
+   
+    static func * (lhs: Self, rhs: Double) -> Double {
+        (lhs.maxSize-lhs.minSize) * rhs + lhs.minSize //lerp
+        //(rhs + lhs.minSize) * lhs.maxSize + lhs.minSize
+    }
+}
 
 enum MapTypeNames: String, CaseIterable {
     case number = "Number"
@@ -16,8 +24,8 @@ enum MapTypeNames: String, CaseIterable {
 
 enum MapType {
     
-    case image(image: CIImage, filters: FiltersChain?)
-    case function((CGPoint) -> Double)
+    case image(image: CIImage, filters: FiltersChain?, dotSize: DotSize)
+    case function(Functions, dotSize: DotSize)
     case number(value: CGFloat)
     
     var name: String {
@@ -31,19 +39,19 @@ enum MapType {
         }
     }
     
-    func value(at point:CGPoint) throws -> Double {
+    func value(at point:CGPoint, in size: CGSize) -> Double {
         switch self {
-        case .image(let image, let chain):
-            return (try chain?.result(source: image) ?? image).pixelColor(at: point).grayValue
-        case .function(let function):
-            return function(point)
+        case .image(let image, let chain, let dotSize):
+            let gray = (try? chain?.result(source: image) ?? image)?.pixelColor(at: point).grayValue ?? 0.5
+            return dotSize * gray
+        case .function(let function, let dotSize):
+            return dotSize * function.inSize(size)(point)
         case .number(let value):
             return value
         }
     }
 
     init (_ name: String) {
-        print (name)
         switch name {
         case MapTypeNames.image.rawValue : self = Defaults.defaultMapImage
         case MapTypeNames.function.rawValue: self = Defaults.defaultMapFunction
@@ -53,10 +61,25 @@ enum MapType {
     
     @MainActor
     func faltten(to size: CGSize) -> Self {
-        if case .image(let image, let filters) = self {
+        if case .image(let image, let filters, let dotSize) = self {
             let flatten = (try? filters?.result(source: image)) ?? image.scaleTo(newSize: size)
-            return .image(image: flatten, filters: nil)
+            return .image(image: flatten, filters: nil, dotSize: dotSize)
         }
         return self
     }
+}
+
+extension MapType: CustomDebugStringConvertible {
+    var debugDescription: String {
+        switch self {
+        case .image(let image, let filters, let dotSize):
+            return "Image \(image) \(filters); Dot Sizes: \(dotSize)"
+        case .function(let functions, let dotSize):
+            return "Fuction \(functions); Dot Sizes: \(dotSize)"
+        case .number(let value):
+            return "Number \(value)"
+        }
+    }
+    
+    
 }

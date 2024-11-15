@@ -7,13 +7,13 @@
 import Foundation
 import SwiftUI
 
-@MainActor
-public final class Dot: Sendable {
+
+public final actor Dot: Sendable {
     public var zone: ClosedRange<Double> {
         lowerBound...upperBound 
     }
     
-    public var at: CGPoint
+    public let at: CGPoint
     public let lowerBound : Double
     public let upperBound : Double
     public let dotSize : Double
@@ -21,13 +21,13 @@ public final class Dot: Sendable {
     public var neighbors: [CGPoint] = []
     private var isFull: Bool = false
 
-    public var innerCircle: GeometricCircle {
+    private func innerCircle() async -> GeometricCircle {
         GeometricCircle(at: at, radius: lowerBound)
     }
-    public var outerCircle: GeometricCircle {
+    public func outerCircle() async -> GeometricCircle {
         GeometricCircle(at: at, radius: upperBound)
     }
-    public var randomInZoneCircle: GeometricCircle  {
+    public func randomInZoneCircle() async -> GeometricCircle  {
         GeometricCircle(at: at, radius: Double.random(in: zone))
     } 
     
@@ -55,7 +55,9 @@ public final class Dot: Sendable {
         return distanceToSelf && distanceToDot  ? 
         side : .none
     }
-    
+    func addNeibour(at: CGPoint) async {
+        neighbors.append(at)
+    }
     func zoneIsEmpty(with dot: Dot, for point: CGPoint, on side: ZoneSide, of dotsAround: [Dot] )  -> Bool {
         var otherDots = dotsAround
         
@@ -77,14 +79,14 @@ public final class Dot: Sendable {
     
     
     func addDots(in size: CGSize, 
-                 allDots: inout [Dot], 
+                 generator: DotGenerator, 
                  density: (CGPoint) -> Double = {_ in 50.0},
                  dotSize:(CGPoint) -> Double = {_ in 0.5},
                  chaos: Double
-    ) -> [Dot]  {
+    ) async -> [Dot]  {
         //CHECK ZONES
         //var childDots: [Dot] = []
-        var dotsAround = allDots.filter {dot in
+        var dotsAround = await generator.dots.filter {dot in
             (dot.at |-| at) < (upperBound * lowerBound) && dot.at != at //&& !isFull
         }
         var newDots: [Dot] = []
@@ -99,7 +101,7 @@ public final class Dot: Sendable {
                              dotSize: dotSize(`where`),
                              chaos: chaos)
             dotsAround.append(newDot)
-            allDots.append(newDot)
+            await generator.addDot(newDot)
         } 
 
         var somethingAdded = true
@@ -108,22 +110,35 @@ public final class Dot: Sendable {
              somethingAdded = false
              search: for dot in dotsAround {
 
-                    if case .points(let up, _) = randomInZoneCircle * dot.randomInZoneCircle {
+                 if case .points(let up, _) = await randomInZoneCircle() * dot.randomInZoneCircle() {
                         let otherDots = dotsAround//.filter({$0.at != dot.at}) 
-                            
-                        let inZoneOfOtherDots = otherDots.reduce(into: false, {$0 = $0 || $1.innerCircle.contains(up)}) 
+                     
+//                        let inZoneOfOtherDots = await otherDots.reduce(into: false,  {
+//                            let z = await $1.innerCircle()
+//                            $0 = $0 || $1.innerCircle().contains(up)}) 
+                     
+                     
+                     func thisDotTouches(_ dots: [Dot]) async -> Bool {
+                         var inZoneOfOtherDots = false 
+                         for otherDot in otherDots {
+                             let inZone = await otherDot.innerCircle().contains(up)
+                             inZoneOfOtherDots = inZoneOfOtherDots ||  inZone
+                         }
+                         return inZoneOfOtherDots
+                     }
+                     
                         let inFrame = (0...size.width).contains(up.x) && (0...size.height).contains(up.y)
-                        
+                     let inZoneOfOtherDots = await thisDotTouches(otherDots)
                         if zoneIsEmpty(with: dot, for: up, on: .up, of: dotsAround) && !inZoneOfOtherDots && inFrame {
                             let newDot = Dot(at: up, 
                                              density: density(up), 
                                              dotSize: dotSize(up),
                                              chaos: chaos)
-                            allDots.append(newDot)
+                            await generator.addDot(newDot)
                             dotsAround.append(newDot)
                             newDots.append(newDot)
                             neighbors.append(newDot.at)
-                            newDot.neighbors.append(at)
+                            await newDot.addNeibour(at: at)
                             somethingAdded = true
                             break search
                         }
@@ -142,14 +157,14 @@ public final class Dot: Sendable {
 //         neighbors.append(point)
 //    }
     
-    func nextPoints(with dot: Dot) -> [CGPoint]  {
+    func nextPoints(with dot: Dot) async -> [CGPoint]  {
         
         let c1r =   self.randomInZoneCircle
         let c2r =    dot.randomInZoneCircle
         let c3r =   self.randomInZoneCircle
         let c4r =    dot.randomInZoneCircle
-        let intersection1 = c1r * c2r
-        let intersection2 = c3r * c4r
+        let intersection1 = await c1r() * c2r()
+        let intersection2 = await c3r() * c4r()
      
         let first: NSPoint?
         switch intersection1 {

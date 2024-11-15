@@ -10,23 +10,44 @@ import SwiftUI
 struct ContentView: View {
     
     @ObservedObject var manager = Manager()
+    @State var refreshPreview: Bool = true
     var body: some View {
         HStack (spacing: 20) {
             VStack {
                 Text("\(manager.size)")
                 HStack {
                     Text("Chaos")
-                    EnterTextFiledView("0,5...0,99", value: $manager.chaos)
+                    EnterTextFiledView("0,5...0,99", 
+                                       value: $manager.chaos,
+                                       in: 0.4...0.99999)
                     ImageSizeView(size: $manager.size)
                 }
-                DotSizesView(manager: manager)
-                HStack {
-                MapTypeView(map: $manager.detailMap).frame(width: 200)
-                MapTypeView(map: $manager.sizeMap).frame(width: 200)
+                
+                DotSizesView(refresh: $refreshPreview)
+                    .frame(height: 180)
+                
+                
+                
+                HStack (alignment: .top) {
+                    MapTypeView(title: "Detail size",
+                                map: $manager.detailMap, 
+                                size: $manager.detailSize,
+                                range: 2...Double.infinity)
+                    MapTypeView(title: "Dot size",
+                                map: $manager.sizeMap, 
+                                size: $manager.dotSize,
+                                range: 0...Double.infinity)
+                    
+                    
+                    
                 }
-            }.frame(width: 450)
+                Spacer()
+            }.onSubmit {
+                refreshPreview = true
+            }.frame(width: 300)
             .environmentObject(manager)
-            Spacer()
+            
+            /*
             VStack {
                 ScrollView([.horizontal, .vertical]) {
                     DotTestView(dots: $manager.dots)
@@ -45,6 +66,7 @@ struct ContentView: View {
                            label: {Text("How to stop?")})
                 }
             }
+             */
         }
         .padding()
         .onChange(of: manager.sizeOwner) {

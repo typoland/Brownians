@@ -8,56 +8,95 @@
 import Foundation
 import AppKit
 
-@MainActor
-public struct DotGenerator {
 
-    static func makeDots(in size: CGSize,
-                         result: inout [Dot],
+
+actor DotGenerator {
+    
+    enum Errors: Error {
+        
+        case success(with: [Dot])
+        case failure(with: [Dot])
+    }
+    
+    func addDot(_ dot:Dot) async {
+        dots.append(dot)
+    }
+    var dots: [Dot] = []
+//    var run: Bool = true
+    func stop() {
+        let t : Task<[Dot], Errors>  //= Task(operation: {[]})         
+    }
+    
+
+    
+    func makeDots(in size: CGSize,
+                         //result: inout [Dot],
                          detailSize: @escaping (CGPoint) -> Double, 
                          dotSize: @escaping (CGPoint) -> Double,
-                         chaos: Double
-    )  {
-        
-        //Do not start in same place
-        let aroundMiddle: (CGSize) -> CGPoint = { size in
-            let center = CGPoint(x: size.width/2, y: size.height/2)
-            let r = detailSize(center)
-            return center + CGPoint(x: Double.random(in: -r...r),
-                                    y: Double.random(in: -r...r))
-        }
-        print ("making dots in size:", size)
-        //first dot somewhere in a middle
-        let p = aroundMiddle(size)
-        let dot = Dot(at: p, density: detailSize(p), dotSize: dotSize(p))
-        
-        
-        //make first dots around
-        var newDots: [Dot] = dot.addDots(in: size, 
-                                         allDots: &result, 
-                                         density: detailSize,
-                                         dotSize: dotSize,
-                                         chaos: chaos)
-        
-        var virginDots: [Dot] = []
+                         chaos: Double ) async 
+    
+    -> Task<[Dot], Never>  
+    
+    {
         var counter = 0
-        
-        //reprat until all dots in frame
-        while !newDots.isEmpty  {
-            virginDots = []
-            for newDot in newDots {
-                autoreleasepool{
-                    virginDots.append(
-                        contentsOf: newDot.addDots(in: size, 
-                                                   allDots: &result, 
+        return Task { () -> [Dot] in
+//            run = true
+            //Do not start in same place
+            let aroundMiddle: (CGSize) -> CGPoint = { size in
+                let center = CGPoint(x: size.width/2, y: size.height/2)
+                let r = detailSize(center)
+                return center + CGPoint(x: Double.random(in: -r...r),
+                                        y: Double.random(in: -r...r))
+            }
+            print ("making dots in size:", size)
+            //first dot somewhere in a middle
+            let p = aroundMiddle(size)
+            let dot = Dot(at: p, density: detailSize(p), dotSize: dotSize(p))
+            dots = []
+            
+            //make first dots around
+            var newDots: [Dot] = await dot.addDots(in: size, 
+                                                   generator: self, 
                                                    density: detailSize,
                                                    dotSize: dotSize,
-                                                   chaos: chaos))
+                                                   chaos: chaos)
+            
+            var virginDots: [Dot] = []
+            
+            
+            //reprat until all dots in frame
+//            print (!newDots.isEmpty, !(newDots.isEmpty && run))
+            //let dotTask = Task {() -> Void in
+            do {
+                while !(newDots.isEmpty) {
+                    try Task.checkCancellation()
+                    virginDots = []
+                    
+                    for newDot in newDots {
+                        //                autoreleasepool {
+                        let z = await newDot.addDots(in: size, 
+                                                     generator: self,
+                                                     density: detailSize,
+                                                     dotSize: dotSize,
+                                                     chaos: chaos)
+                        virginDots.append(contentsOf: z)
+                    }
+                    newDots = virginDots
+                    print ("\(dots.count) dots counted in \(counter) generations")
+                    counter += 1
+                    // }
                 }
-                newDots = virginDots
-                
+            } catch {
+                print ("Generator Canceled at \(counter)")
+//                run = false
+                return dots
             }
-            counter += 1
-            print ("\(result.count) dots counted in \(counter) grnerations")
+
+            print ("Generator At the end Done")
+//            run = false
+            return dots
+            
+            
         }
     }
 }

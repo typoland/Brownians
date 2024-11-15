@@ -16,13 +16,15 @@ struct ImageSizeView: View {
             Text("width:")  
             
             EnterTextFiledView("width",
-                               value: $size.width)
+                               value: $size.width,
+                               in: 0...10000)
             .disabled(disabled)
             
             
             Text("height:")
             EnterTextFiledView("height",
-                               value: $size.height)
+                               value: $size.height,
+                               in: 0...10000)
             .disabled(disabled)
             
             Text("size owner")

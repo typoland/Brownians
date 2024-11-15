@@ -8,12 +8,14 @@
 
 import SwiftUI
 
+
 struct FilterView : View {
     @Binding var filter: Filters 
     var body: some View {
         
         VStack (alignment: .leading, spacing: 5) {
             Text("\(filter.name)").lineLimit(1).fontWeight(.black)
+            
             switch filter {
             
             case .colorMonochrome(let color, let intensity):
@@ -41,8 +43,10 @@ struct FilterView : View {
                 let bindingRadius = Binding(get: {radius}, 
                                             set: {filter = .gaussianBlur(radius: $0)}) 
                 TextField("radius", value: bindingRadius, format: .number)
+                
             case .invert:
                 EmptyView()
+                
             case .enhancer(amount: let amount):
                 let bindingAmount = Binding(get: {amount}, 
                                             set: {filter = .enhancer(amount: $0)}) 

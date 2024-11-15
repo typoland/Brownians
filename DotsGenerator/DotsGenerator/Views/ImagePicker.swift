@@ -9,9 +9,9 @@ struct ImagePicker: View {
     @Binding var image: CIImage
     @State var isImporting: Bool = false
     @EnvironmentObject var manger: Manager
+    
     var body: some View {
         VStack {
-            
             Image(nsImage: image.nsImage)
                 .resizable()
                 .aspectRatio(contentMode: .fit)

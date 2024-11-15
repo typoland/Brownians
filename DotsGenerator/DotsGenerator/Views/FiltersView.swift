@@ -46,20 +46,20 @@ struct FiltersView: View {
                                                 set: {filters[index] = $0})
                     Divider()
                     HStack (alignment: .top) {
+                        
                         FilterView(filter: bindingFilter)
+                        
                         Button (action: {
                             remove(at: index)
-                        }) {Image(systemName: "trash")}
+                        }) { Image(systemName: "trash")}
                             .buttonStyle(.bordered)
                             .controlSize(.small)
                     }
                     Divider()
                     FiltersChooser(filterName: bindFilters(index: index+1))
                     
-                    
-                    
                 }
-                Spacer()
+                
             }
            
         }

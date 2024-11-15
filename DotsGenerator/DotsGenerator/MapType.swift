@@ -6,6 +6,8 @@
 //
 import CoreImage
 
+
+
 enum MapTypeNames: String, CaseIterable {
     case number = "Number"
     case image = "Image"

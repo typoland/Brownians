@@ -31,7 +31,6 @@ class Manager : ObservableObject {
     
     @Published var detailMap: MapType = Defaults.defaultMapImage
     
-    
     @Published var sizeMap: MapType = Defaults.defaultMapImage
     
     @Published var detailSize = DotSize(maxSize: 6, minSize: 4)
@@ -79,10 +78,11 @@ class Manager : ObservableObject {
         let sizeMap = sizeMap.faltten(to: size)
         let dotSize = self.dotSize
         let detailSize = self.detailSize
+        let generator = DotGenerator()
         Task {
-             DotGenerator
+            await generator
                 .makeDots(in:  size, 
-                          result: &dots,
+                          //result: &dots,
                           detailSize: {self.mapValue(at: $0, 
                                                      in: detailMap,
                                                      for: detailSize)}, 

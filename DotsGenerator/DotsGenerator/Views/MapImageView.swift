@@ -12,16 +12,15 @@ struct MapImageView: View {
    
     var body: some View {
         VStack {
-
+            
             ImagePicker(image: $image)
-                
-                
             if let res = try? filters?.result(source: image) {
                 Image(nsImage: res.nsImage)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    
+                
             }
+
             let bindingFilters = Binding(
                 get: {filters?.chain ?? [] as [Filters]}, 
                 set: { 
@@ -35,6 +34,9 @@ struct MapImageView: View {
             
             FiltersView(filters: bindingFilters)
             
+           
+            
+            Spacer()
         }
     }
 }

@@ -9,7 +9,6 @@ import SwiftUI
 struct MapValueView<T>: View 
 where T: FloatingPoint {
     @Binding var value: T
-    ///var range: ClosedRange<T>
     var body: some View {
         EnterTextFiledView("value:", value: $value, in: 0...1)
     }

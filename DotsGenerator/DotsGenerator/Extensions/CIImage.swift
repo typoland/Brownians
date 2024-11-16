@@ -94,11 +94,12 @@ Element.Index == Int {
     func value(at point: CGPoint, for size: Double) -> Double {
         let x = Int(point.x)// - size/2)
         let y = Int(point.y)// - size/2)
-        let blockSize = Int(size)
+        
         guard !self.isEmpty, !self[0].isEmpty, y<count, x < self[0].count else {return Double.nan}
         return self[y][x]
         //Somehow take average from [y...y+width][x...x+width
         /*
+        let blockSize = Int(size)
         let ox = x < 0 ? 0 : x
         let oy = y < 0 ? 0 : y
         

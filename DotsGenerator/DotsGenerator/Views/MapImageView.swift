@@ -18,7 +18,6 @@ struct MapImageView: View {
                 Image(nsImage: res.nsImage)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                
             }
 
             let bindingFilters = Binding(
@@ -33,9 +32,7 @@ struct MapImageView: View {
                 })
             
             FiltersView(filters: bindingFilters)
-            
-           
-            
+
             Spacer()
         }
     }

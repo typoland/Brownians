@@ -26,7 +26,7 @@ where T : FloatingPoint {
             value = local
         }
     }
-    init(_ titleKey: LocalizedStringKey, value: Binding<T>, in range:ClosedRange<T>// = -Double.infinity...Double.infinity
+    init(_ titleKey: LocalizedStringKey, value: Binding<T>, in range:ClosedRange<T>
     ) {
         self.titleKey = titleKey
         self._value = value

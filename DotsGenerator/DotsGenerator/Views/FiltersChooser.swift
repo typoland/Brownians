@@ -29,6 +29,5 @@ struct FiltersChooser : View {
             .controlSize(.small)
             .frame(width: 102)
         }
-            
     }
 }

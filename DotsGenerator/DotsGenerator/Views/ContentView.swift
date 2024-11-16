@@ -43,7 +43,7 @@ struct ContentView: View {
                     MapTypeView(title: "Detail size",
                                 map: $manager.detailMap, 
                                 dotSize: $manager.detailSize,
-                                range: 1...Double.infinity)
+                                range: 2...Double.infinity)
                     MapTypeView(title: "Dot size",
                                 map: $manager.sizeMap, 
                                 dotSize: $manager.dotSize,

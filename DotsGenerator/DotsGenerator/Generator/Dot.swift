@@ -111,10 +111,6 @@ public final actor Dot: Sendable {
                  if case .points(let up, _) = await randomInZoneCircle() * dot.randomInZoneCircle() {
                         let otherDots = dotsAround//.filter({$0.at != dot.at}) 
                      
-//                        let inZoneOfOtherDots = await otherDots.reduce(into: false,  {
-//                            let z = await $1.innerCircle()
-//                            $0 = $0 || $1.innerCircle().contains(up)}) 
-                     
                      
                      func thisDotTouches(_ dots: [Dot]) async -> Bool {
                          var inZoneOfOtherDots = false 

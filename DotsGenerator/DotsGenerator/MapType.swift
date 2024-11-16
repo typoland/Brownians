@@ -38,19 +38,6 @@ enum MapType {
         }
     }
     
-//    func value(at point:CGPoint, in size: CGSize) -> Double {
-//        switch self {
-//        case .image(let image, let chain):
-//            return (try? chain?.result(source: image) 
-//                    ?? image)?.pixelColor(at: point).grayValue 
-//            ?? 0.5
-//        case .function(let function):
-//            return function.inSize(size)(point)
-//        case .number(let value):
-//            return value
-//        }
-//    }
-
     init (_ name: String) {
         switch name {
         case MapTypeNames.image.rawValue : self = Defaults.defaultMapImage

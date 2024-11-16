@@ -33,15 +33,8 @@ class Manager : ObservableObject {
     @Published var dots: [Dot] = []
     
     @Published var chaos: Double = 0.7
-    
-//    @MainActor
-//    let savePDF = PassthroughSubject<Void, Never>()
-//    func sendSaveCommand() async {
-//        savePDF.send()
-//    }
-    
-    
-    func mapValue(map: MapType, dotSize: DotSize, in size: CGSize) -> (CGPoint, CGSize) -> Double {
+        
+    private func mapValue(map: MapType, dotSize: DotSize, in size: CGSize) -> (CGPoint, CGSize) -> Double {
         let valueCount : (CGPoint, CGSize) ->Double
         let map = map.faltten(to: size)
         switch map {
@@ -79,7 +72,6 @@ class Manager : ObservableObject {
             if case .image(let image, _) = detailMap {
                 self.finalSize = image.extent.size
             } else {
-                //_self.size = self.size
                 sizeOwner = .manager
             }
         case .sizeMap:

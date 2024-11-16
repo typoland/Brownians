@@ -14,25 +14,20 @@ struct MapTypeView: View {
     var range: ClosedRange<Double>
     var body: some View {
         VStack {
-           
-            
             Text(title)
+            
             let nameBinding = Binding(
                 get: {map.name}, 
                 set: {map = MapType($0)})
             MapTypeChooser(mapName: nameBinding)
             
-            
-            
             switch map {
             case .function(let function):
-                
                 SizesView(dotSize: $dotSize, range: range)
                 MapFunctionView(function: function)
                 
             case .image(let image, 
                         let filtersChain):
-                
                 SizesView(dotSize: $dotSize, 
                           range: range)
                 
@@ -46,14 +41,13 @@ struct MapTypeView: View {
                                        filters: filtersChain)})
                 MapImageView(image: bindingImage, 
                              filters: bindingChain)
+                
             case .number(value: let value):
                 let binding = Binding(get: {value}, 
                                       set: {map = .number(value: $0)})
                 MapValueView(value: binding) 
             }
-            
         }
-        
     }
 }
 

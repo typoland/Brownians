@@ -41,7 +41,7 @@ actor DotGenerator {
     {
         var generationNr = 0
         return Task { () -> [Dot] in
-            //Do not start in same place
+            //Do not start in the same place
             let aroundMiddle: (CGSize) -> CGPoint = { size in
                 let center = startAt ?? CGPoint(x: size.width/2, y: size.height/2)
                 let r = abs(detailMap(center, size))
@@ -51,8 +51,8 @@ actor DotGenerator {
             //first dot somewhere in a middle
             let p = aroundMiddle(size)
             let dot = Dot(at: p, 
-                          density: detailMap( p, size), 
-                          dotSize: dotSizeMap( p, size))
+                          density: detailMap(p, size), 
+                          dotSize: dotSizeMap(p, size))
             dots = [dot]
             
             //make first dots around
@@ -70,7 +70,6 @@ actor DotGenerator {
                     virginDots = []
                     
                     for newDot in newDots {
-                        //                autoreleasepool {
                         let z = await newDot.addDots(in: size, 
                                                      generator: self,
                                                      density: detailMap,
@@ -81,7 +80,6 @@ actor DotGenerator {
                     newDots = virginDots
                     generationNr += 1
                     await sendTemporaryResult()
-                    // }
                 }
             } catch {
               return dots

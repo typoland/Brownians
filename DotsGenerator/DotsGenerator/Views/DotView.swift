@@ -31,12 +31,14 @@ struct DotView: View {
             for dotIndex in 0..<dots.count {
                 let dot = dots[dotIndex]
                 let circleSize = dot.upperBound * dot.dotSize
-                let path = CircleShape()
-                    .path(in: CGRect(x: dot.at.x, 
-                                     y: dot.at.y, 
-                                     width: circleSize, 
-                                     height: circleSize))
-                context.fill(path, with: .color(.black))
+                if circleSize > 0 {
+                    let path = CircleShape()
+                        .path(in: CGRect(x: dot.at.x, 
+                                         y: dot.at.y, 
+                                         width: circleSize, 
+                                         height: circleSize))
+                    context.fill(path, with: .color(.black))
+                }
             }
         }.background(content: {Color.white})
     }

@@ -22,7 +22,7 @@ import Combine
 //    public  func sink(receiveValue: @escaping ((Self.Output) -> Void)) -> AnyCancellable {  }
 //}
 
-struct DotSizesView: View {
+struct GenerateDotsView: View {
     @Binding var refresh: Bool
     @ObservedObject var manager: Manager
     @State var dots: [Dot] = []
@@ -47,8 +47,10 @@ struct DotSizesView: View {
                     .frame(width: proxy.size.width, height: proxy.size.height)
                     .background(refresh ? Color.red : Color.white)
                     .onAppear {
-                        Task {
-                            await start(in: proxy.size, manager: manager)
+                        if refresh {
+                            Task {
+                                await start(in: proxy.size, manager: manager)
+                            }
                         }
                     }
                 
@@ -57,6 +59,9 @@ struct DotSizesView: View {
                             Task {
                                 await start(in: proxy.size, manager: manager)
                             }
+                        } else {
+                            generatorTask.cancel()
+                            refresh = false
                         }
                     }
                     .onReceive(generator.updateGeneratorDots) {_ in
@@ -65,30 +70,25 @@ struct DotSizesView: View {
                         }
                         
                     }
-                HStack {
-                    if refresh {
-                        Button("Stop") {
-                            generatorTask.cancel()
-                            refresh = false
-                        }
-                    }
-                    if refresh {
-                        Button("Look") {
-                            Task {
-                                dots = await generator.currentDots()
-                            }
-                        }
-                    }
-                    
-                }
             }
+//        }
+//            VStack {
+//                Spacer()
+//                HStack {
+//                    if refresh {
+//                        Button("Stop") {
+//                            
+//                        }
+//                    }
+//                }
+           
         }
     }
 }
 
 #Preview {
     @Previewable @State var refresh: Bool = true
-    DotSizesView(refresh: $refresh, manager: Manager())
+    GenerateDotsView(refresh: $refresh, manager: Manager())
         .frame(width: 40, height: 40)
         .environmentObject( Manager())
 }

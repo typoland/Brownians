@@ -91,10 +91,34 @@ extension Array where
 Element : Collection, 
 Element.Element == Double,
 Element.Index == Int {
-    func value(at point: CGPoint) -> Double {
-        let x = Int(point.x)
-        let y = Int(point.y)
+    func value(at point: CGPoint, for size: Double) -> Double {
+        let x = Int(point.x)// - size/2)
+        let y = Int(point.y)// - size/2)
+        let blockSize = Int(size)
         guard !self.isEmpty, !self[0].isEmpty, y<=count, x <= self[0].count else {return Double.nan}
         return self[y][x]
+        //Somehow take average from [y...y+width][x...x+width
+        /*
+        let ox = x < 0 ? 0 : x
+        let oy = y < 0 ? 0 : y
+        
+        let oHeight = oy + blockSize >= self.count ? self.count - oy : blockSize
+        let oWidth = ox + blockSize >= self[0].count ? self[0].count - ox : blockSize
+        
+        print (ox, oy, oHeight, oWidth)
+        var counter = 0.0
+        var sum = 0.0
+//        print (oy..<oy+oHeight)
+        let cut = self[oy..<oy+oHeight]
+        for line in cut {
+            for val in line[ox..<ox+oWidth] {
+                sum += val
+                counter += 1
+            }
+        }
+        print (sum/counter)
+//        print ()
+        return sum/counter
+         */
     }
 }

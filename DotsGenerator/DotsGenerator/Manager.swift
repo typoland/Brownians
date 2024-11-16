@@ -20,13 +20,14 @@ class Manager : ObservableObject {
     
     @Published var sizeOwner: SizeOwner = .manager
     
-    @Published var finalSize: CGSize = CGSize(width: 100, height: 100)
+    @Published var finalSize: CGSize = CGSize(width: 800, height: 600)
     
     @Published var detailMap: MapType = Defaults.defaultMapImage
     
     @Published var sizeMap: MapType = Defaults.defaultMapImage
     
     @Published var detailSize = DotSize(minSize: 4, maxSize: 6)
+    
     @Published var dotSize = DotSize(minSize: 0.2, maxSize: 0.7)
     
     @Published var dots: [Dot] = []
@@ -40,7 +41,7 @@ class Manager : ObservableObject {
             
         case .image(image: let image, _):
             let grayMap = image.grayMap            
-            valueCount =  {point, _ in grayMap.value(at: point)}
+            valueCount =  {point, _ in grayMap.value(at: point, for: dotSize.maxSize)}
         case .function(let function):
             valueCount = {point, size in function.inSize(size)(point)}
         case .number(value: let value):

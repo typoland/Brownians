@@ -15,7 +15,7 @@ extension DotView {
         let url = URL(fileURLWithPath: "/Users/lukasz/Desktop/Blendy/\(name) \(dateString).pdf")
         print ("Saving to \(url)")
         let renderer = ImageRenderer(content: canvas.frame(width: size.width, 
-                                                         height: size.width) ) 
+                                                           height: size.height) ) 
 
         
         //https://www.swiftanytime.com/blog/imagerenderer-in-swiftui

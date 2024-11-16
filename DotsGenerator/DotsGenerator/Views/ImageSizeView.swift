@@ -42,18 +42,18 @@ struct SizeOwnerChooser: View {
     
     @EnvironmentObject var manager: Manager
     var body: some View {
-        Text("Debug")
-//        Picker("", selection: $manager.sizeOwner) {
-//            Text("program")
-//                .tag(Manager.SizeOwner.manager)
-//            if case .image(_,_) = manager.detailMap {
-//                Text("detail Map")
-//                    .tag(Manager.SizeOwner.detailMap)
-//            }
-//            if case .image(_,_) = manager.sizeMap {
-//                Text("strength Map")
-//                    .tag(Manager.SizeOwner.sizeMap)
-//            }
-//        }
+        //Text("Debug")
+        Picker("", selection: $manager.sizeOwner) {
+            Text("program")
+                .tag(Manager.SizeOwner.manager)
+            if case .image(_,_) = manager.detailMap {
+                Text("detail Map")
+                    .tag(Manager.SizeOwner.detailMap)
+            }
+            if case .image(_,_) = manager.sizeMap {
+                Text("strength Map")
+                    .tag(Manager.SizeOwner.sizeMap)
+            }
+        }
     }
 }

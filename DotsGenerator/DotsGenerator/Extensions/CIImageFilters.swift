@@ -94,10 +94,10 @@ public extension CIImage {
         )?.outputImage 
     }
     
-    func areaAverage(at point: CGPoint) -> CIImage? {
-        let rect = CGRect(origin: CGPoint(x: point.x-1, 
-                                          y: point.y-1), 
-                          size: CGSize(width: 3, height: 3))
+    func areaAverage(at point: CGPoint, size: CGSize) -> CIImage? {
+        let rect = CGRect(origin: CGPoint(x: point.x-size.width/2, 
+                                          y: point.y-size.height/2), 
+                          size: size)
         return CIFilter(name:"CIAreaAverage",
                  parameters: [
                     kCIInputImageKey: self,

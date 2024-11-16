@@ -16,7 +16,7 @@ struct ContentView: View {
     @ViewBuilder
     var finalView : some View {
         let size = manager.finalSize
-        DotSizesView(refresh: $refreshDrawing, manager: manager)
+        GenerateDotsView(refresh: $refreshDrawing, manager: manager)
                 .frame(width:size.width, 
                        height: size.height)
      
@@ -25,16 +25,9 @@ struct ContentView: View {
     var body: some View {
         HStack (spacing: 20) {
             VStack {
-                Text("\(manager.finalSize)")
-                HStack {
-                    Text("Chaos")
-                    EnterTextFiledView("0,5...0,99", 
-                                       value: $manager.chaos,
-                                       in: 0.4...0.99999)
-                    ImageSizeView(size: $manager.finalSize)
-                }
                 
-                DotSizesView(refresh: $refreshPreview, manager: manager)
+                
+                GenerateDotsView(refresh: $refreshPreview, manager: manager)
                     .frame(height: 200)
                 
                 
@@ -43,11 +36,11 @@ struct ContentView: View {
                     MapTypeView(title: "Detail size",
                                 map: $manager.detailMap, 
                                 dotSize: $manager.detailSize,
-                                range: 2...Double.infinity)
+                                range: 1...Double.infinity)
                     MapTypeView(title: "Dot size",
                                 map: $manager.sizeMap, 
                                 dotSize: $manager.dotSize,
-                                range: 0...Double.infinity)
+                                range: 0...1)
                     
                     
                     
@@ -60,6 +53,16 @@ struct ContentView: View {
             
             
             VStack {
+                
+                HStack {
+                    Text("\(manager.finalSize)")
+                    Text("Chaos")
+                    EnterTextFiledView("0,5...0,99", 
+                                       value: $manager.chaos,
+                                       in: 0.4...1)
+                    ImageSizeView(size: $manager.finalSize)
+                }.environmentObject(manager)
+                
                 ScrollView([.horizontal, .vertical]) {
                     let size = manager.finalSize
                     finalView
@@ -69,14 +72,10 @@ struct ContentView: View {
                 }
                 HStack {
                     Button(action: {
-                        
-                        refreshDrawing = true
-                        }, 
-                           label: {Text("Start")})
-                    Button(action: {
-                        print ("stop")
+                        refreshDrawing.toggle()
                     }, 
-                           label: {Text("How to stop?")})
+                           label: {Text("\(refreshDrawing ? "Stop" : "Start")")})
+                
                 }
             }
              

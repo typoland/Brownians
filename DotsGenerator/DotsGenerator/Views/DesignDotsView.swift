@@ -26,46 +26,16 @@ struct DotSizesView: View {
     @Binding var refresh: Bool
     @EnvironmentObject var manager: Manager
     @State var dots: [Dot] = []
-    //@State var isRunning: Bool = true
-//    var detailMap: (CGSize) -> MapType
-//    var dotSizeMap: (CGSize) -> MapType
+    
     var generator = DotGenerator()
     @State var generatorTask : Task<[Dot], Never> = Task {[]}
     
-    //let previewSize: CGSize = CGSize(width: 100, height: 100)
-    
-//    var detailSize: (MapType, CGSize) -> (CGPoint) -> Double = {manager, frame in
-//        { point in
-//        manager.detailSize * (1.0-point.x/frame.width)}
-//    }
-//    
-//    var dotSize:(MapType, CGSize) -> (CGPoint) -> Double = {manager, frame in
-//        {point in manager.dotSize * (1.0-point.y/frame.height)}
-//    }
-
-    
-//    var detailMap: (CGSize) -> MapType  = { size in
-//        return .function(
-//            Functions.verticalBlend,
-//            dotSize: DotSize(minSize: 6, maxSize: 10))
-//        
-//    }
-//    var dotSizeMap: (CGSize) -> MapType = { size in
-//        return .function(
-//            Functions.horizontalBlend,
-//            dotSize: DotSize(minSize: 0.1, maxSize: 0.9))
-//        
-//    }
-    
     func start(in size: CGSize) async {
-       
-       
         generatorTask = await generator
             .makeDotsTask(in: size, 
-                      //result: &dots, 
-                          detailMap: manager.det() , 
-                          dotSizeMap: manager.siz(),
-                      chaos: manager.chaos)
+                          detailMap: manager.detailSizeClosure(in:size) , 
+                          dotSizeMap: manager.dotSizeClosure(in: size),
+                          chaos: manager.chaos)
         dots =  await generatorTask.value
         refresh = false 
     }
@@ -79,7 +49,7 @@ struct DotSizesView: View {
                         let circleSize = dot.upperBound * dot.dotSize
                         let path = CircleShape()
                             .path(in: CGRect(x: dot.at.x, 
-                                             y: dot.at.y, 
+                                             y: size.height - dot.at.y, 
                                              width: circleSize, 
                                              height: circleSize))
                         context.fill(path, with: .color(.black))

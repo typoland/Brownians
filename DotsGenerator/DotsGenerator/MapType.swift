@@ -12,7 +12,6 @@ struct DotSize {
    
     static func * (lhs: Self, rhs: Double) -> Double {
         (lhs.maxSize-lhs.minSize) * rhs + lhs.minSize //lerp
-        //(rhs + lhs.minSize) * lhs.maxSize + lhs.minSize
     }
 }
 
@@ -39,16 +38,18 @@ enum MapType {
         }
     }
     
-    func value(at point:CGPoint, in size: CGSize) -> Double {
-        switch self {
-        case .image(let image, let chain):
-            return (try? chain?.result(source: image) ?? image)?.pixelColor(at: point).grayValue ?? 0.5
-        case .function(let function):
-            return function.inSize(size)(point)
-        case .number(let value):
-            return value
-        }
-    }
+//    func value(at point:CGPoint, in size: CGSize) -> Double {
+//        switch self {
+//        case .image(let image, let chain):
+//            return (try? chain?.result(source: image) 
+//                    ?? image)?.pixelColor(at: point).grayValue 
+//            ?? 0.5
+//        case .function(let function):
+//            return function.inSize(size)(point)
+//        case .number(let value):
+//            return value
+//        }
+//    }
 
     init (_ name: String) {
         switch name {
@@ -58,11 +59,15 @@ enum MapType {
         }
     }
     
-    @MainActor
     func faltten(to size: CGSize) -> Self {
         if case .image(let image, let filters) = self {
-            let flatten = (try? filters?.result(source: image)) ?? image.scaleTo(newSize: size)
-            return .image(image: flatten, filters: nil)
+            let flatten = (try? filters?
+                .result(source: image))?
+                .scaleTo(newSize: size) 
+            ?? image
+                .scaleTo(newSize: size)
+            return .image(image: flatten, 
+                          filters: nil)
         }
         return self
     }

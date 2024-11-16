@@ -18,6 +18,7 @@ public struct FiltersChain: Equatable {
     }
     
     var chain: [Filters]
+    
     func result(source: CIImage) throws -> CIImage {
         var result: CIImage? = source
         for filter in chain {

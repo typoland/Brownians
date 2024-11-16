@@ -14,13 +14,13 @@ struct ContentView: View {
     var body: some View {
         HStack (spacing: 20) {
             VStack {
-                Text("\(manager.size)")
+                Text("\(manager.finalSize)")
                 HStack {
                     Text("Chaos")
                     EnterTextFiledView("0,5...0,99", 
                                        value: $manager.chaos,
                                        in: 0.4...0.99999)
-                    ImageSizeView(size: $manager.size)
+                    ImageSizeView(size: $manager.finalSize)
                 }
                 
 //                var detailMap: (CGSize) -> MapType  = { size in

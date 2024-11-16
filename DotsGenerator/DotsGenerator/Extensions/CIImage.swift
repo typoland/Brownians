@@ -7,6 +7,8 @@
 
 import CoreImage
 import AppKit
+import Foundation
+import Accelerate
 
 public extension CGImage {
     static func from(ciImage: CIImage) -> CGImage? {
@@ -42,129 +44,57 @@ public extension CIImage {
         return nsImage 
     }
     
-    var detailMap: CIImage? {
-        guard let edges = CIFilter(name: "CICannyEdgeDetector",
-                                   parameters: [kCIInputImageKey: self,
-                                                //"inputGaussianSigma": NSNumber(0)
-                                               ]
-        )?.outputImage else {return nil}
-        guard let blurred = CIFilter(name:"CIGaussianBlur",
-                                     parameters: [kCIInputImageKey: edges,
-                                                  "inputRadius": NSNumber(4)])?.outputImage else {return nil}
-        guard let adjusted = CIFilter(name:"CIExposureAdjust",
-                                      parameters: [kCIInputImageKey: blurred,
-                                                   "inputEV": NSNumber(1.5)
-                                                  ])?.outputImage else {return nil}
-        return adjusted 
-        
-        
+    var bufferWTF: SIMD4<UInt8> {
+        var buffer = SIMD4<UInt8>.init(x: 0, y: 0, z: 0, w: 0)
+        let context = CIContext()
+        context.render(self, 
+                       toBitmap: &buffer, 
+                       rowBytes:  4, 
+                       bounds: self.extent, 
+                       format: .RGBA8,
+                       colorSpace: nil)
+        return buffer
     }
     
-    func pixelColor(at point: CGPoint) -> NSColor {
-        let rect = CGRect(x: point.x.rounded(), y: point.y.rounded(),width: 1, height: 1)
-        let pixelImage = self.cropped(to: rect)
-        guard let cgImage = CGImage.from(ciImage: pixelImage)
-        else { 
-            print ("no cgImage")
-            return NSColor(red: 0, green: 0, blue: 0, alpha: 1)
-        }
-        guard var format = vImage_CGImageFormat(cgImage: cgImage) else {
-            NSLog("Unable to derive format from image.")
-            return NSColor(red: 0, green: 0, blue: 0, alpha: 1)
-        }
+    var grayMap: [[Double]] {
         
-        guard let buf = try? vImage.PixelBuffer(
-            cgImage: cgImage,
-            cgImageFormat: &format,
-            pixelFormat: vImage.Interleaved8x4.self)
-                
-        else {
-            print ("no buffer")
-            return NSColor(red: 0, green: 0, blue: 0, alpha: 1)
+        func simdToDouble(simd: SIMD4<UInt8>) -> Double {
+            0.299 * Double(simd.x)/255 
+            + 0.587 * Double(simd.y)/255  
+            + 0.114 * Double(simd.z)/255 
         }
-        if buf.count == 1 {
-            let c = Double(buf.array[0])/255.0
-            return NSColor(red: 0.299*c, green: 0.587*c, blue: 0.114*c, alpha: 1)
+        let width = Int(self.extent.width)
+        let height = Int(self.extent.height)
+        let bufferSize = width*height
+        let zero = SIMD4<UInt8>.init(x: 0, y: 0, z: 0, w: 0)
+        var buffer : [SIMD4<UInt8>] = Array(repeating: zero, count: bufferSize)
+        let context = CIContext()
+        context.render(self, 
+                       toBitmap: &buffer, 
+                       rowBytes:  width*4, 
+                       bounds: self.extent, 
+                       format: .RGBA8,
+                       colorSpace: nil)
+        var result : [[Double]] = []
+        (0..<height).forEach {rowIndex in
+            let rowStart = rowIndex * width
+            let rowEnd = rowStart + width
+            let row = buffer[rowStart..<rowEnd]
+            let grays = row.map {simdToDouble(simd: $0)}
+            result.append(grays)
         }
-        let r = Double(buf.array[0])/255.0
-        let g = Double(buf.array[1])/255.0
-        let b = Double(buf.array[2])/255.0
-        let a = Double(buf.array[3])/255.0
-        return NSColor(red: r, green: g, blue: b, alpha: a)
+        return result
     }
-    
-    
-    var detailLevel: Double {
-        let filterEdgeDetector = CIFilter(name: "CICannyEdgeDetector",
-                                          parameters: [kCIInputImageKey: self,
-                                                       //"inputGaussianSigma": NSNumber(0)
-                                                      ]
-        ) 
-        guard let definedEdges = filterEdgeDetector?.outputImage 
-        else {print ("no edges")
-            return 0.0
-        }
-        
-        guard let cgImage = CGImage.from(ciImage: definedEdges)
-        else { 
-            print ("no cgImage \(definedEdges.extent)")
-            return 0.0
-        }
-        guard var format = vImage_CGImageFormat(cgImage: cgImage) else {
-            NSLog("Unable to derive format from image.")
-            return 0.0
-        }
-        
-        guard let buf = try? vImage.PixelBuffer(
-            cgImage: cgImage,
-            cgImageFormat: &format,
-            pixelFormat: vImage.Interleaved8x4.self)
-                
-        else {print ("no buffer")
-            return 0.0}
-        
-        var sum = 0.0
-        let componentLength = Double(format.bitsPerPixel) / Double(format.bitsPerComponent)
-        
-        for i in stride(from: 0, to: buf.array.count, by: Int(componentLength)) {
-            sum += Double(buf.array[i])/255.0
-        }
-        return sum / (Double(buf.array.count) / componentLength)
-    }
-    
-    var averageColor: NSColor {
-        guard let cgImage = self.cgImage// CGImage.from(ciImage: self)
-        else { 
-            print ("no cgImage")
-            return NSColor.clear
-        }
-        guard var format = vImage_CGImageFormat(cgImage: cgImage) else {
-            NSLog("Unable to derive format from image.")
-            return NSColor.clear
-        }
-        
-        guard let buf = try? vImage.PixelBuffer(
-            cgImage: cgImage,
-            cgImageFormat: &format,
-            pixelFormat: vImage.Interleaved8x4.self)
-                
-        else {
-            print ("no buffer")
-            return  NSColor.clear
-        }
-        
-        var sum = [0.0, 0.0, 0.0]
-        
-        
-        let componentLength = Double(format.bitsPerPixel) / Double(format.bitsPerComponent)
-        
-        for i in stride(from: 0, to: buf.array.count, by: Int(componentLength)) {
-            sum[0] += Double(buf.array[i])/255.0
-            sum[1] += Double(buf.array[i+1])/255.0
-            sum[2] += Double(buf.array[i+2])/255.0
-        } 
-        let res = sum.map{$0/(Double(buf.array.count) / componentLength)}
-       
-        return NSColor(red: res[0], green: res[1], blue: res[2], alpha: 1)
+}
+
+extension Array where 
+Element : Collection, 
+Element.Element == Double,
+Element.Index == Int {
+    func value(at point: CGPoint) -> Double {
+        let x = Int(point.x)
+        let y = Int(point.y)
+        guard y<=count, x <= self[0].count else {return Double.nan}
+        return self[y][x]
     }
 }

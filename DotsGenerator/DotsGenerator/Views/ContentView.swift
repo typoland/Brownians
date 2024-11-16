@@ -12,11 +12,16 @@ struct ContentView: View {
     @ObservedObject var manager = Manager()
     @State var refreshPreview: Bool = true
     @State var refreshDrawing: Bool = false
+    @State var savePDF: Bool = false
+    
+    
     
     @ViewBuilder
     var finalView : some View {
         let size = manager.finalSize
-        GenerateDotsView(refresh: $refreshDrawing, manager: manager)
+        GenerateDotsView(refresh: $refreshDrawing, 
+                         savePDF: $savePDF, 
+                         manager: manager)
                 .frame(width:size.width, 
                        height: size.height)
      
@@ -27,7 +32,9 @@ struct ContentView: View {
             VStack {
                 
                 
-                GenerateDotsView(refresh: $refreshPreview, manager: manager)
+                GenerateDotsView(refresh: $refreshPreview, 
+                                 savePDF: .constant(false), 
+                                 manager: manager)
                     .frame(height: 200)
                 
                 
@@ -74,7 +81,12 @@ struct ContentView: View {
                     Button(action: {
                         refreshDrawing.toggle()
                     }, 
-                           label: {Text("\(refreshDrawing ? "Stop" : "Start")")})
+                           label: {Text("\(refreshDrawing ? "⏸️ Stop" : " ▶️ Start") Render")})
+                    .buttonStyle( .borderless )
+                    .controlSize(.extraLarge)
+                    Button (action: {
+                        savePDF = true
+                    }, label: {Text("save PDF")})
                 
                 }
             }

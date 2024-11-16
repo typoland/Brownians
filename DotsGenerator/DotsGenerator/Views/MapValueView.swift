@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
-struct MapValueView: View {
-    @Binding var value: CGFloat
+struct MapValueView<T>: View 
+where T: FloatingPoint {
+    @Binding var value: T
+    ///var range: ClosedRange<T>
     var body: some View {
-        TextField("value:", value: $value, formatter: NumberFormatter())
+        EnterTextFiledView("value:", value: $value, in: 0...1)
     }
 }

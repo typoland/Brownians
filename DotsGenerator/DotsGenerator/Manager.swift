@@ -6,7 +6,7 @@
 //
 import Foundation
 import CoreImage
-
+import Combine
 
 @MainActor
 class Manager : ObservableObject {
@@ -34,6 +34,13 @@ class Manager : ObservableObject {
     
     @Published var chaos: Double = 0.7
     
+//    @MainActor
+//    let savePDF = PassthroughSubject<Void, Never>()
+//    func sendSaveCommand() async {
+//        savePDF.send()
+//    }
+    
+    
     func mapValue(map: MapType, dotSize: DotSize, in size: CGSize) -> (CGPoint, CGSize) -> Double {
         let valueCount : (CGPoint, CGSize) ->Double
         let map = map.faltten(to: size)
@@ -45,7 +52,7 @@ class Manager : ObservableObject {
         case .function(let function):
             valueCount = {point, size in function.inSize(size)(point)}
         case .number(value: let value):
-            valueCount = {_, _ in value * dotSize.maxSize}
+            valueCount = {_, _ in value }
         }
         
         return {point, size in

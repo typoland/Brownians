@@ -19,13 +19,11 @@ import Foundation
 
 struct DotView: View {
 
-    //@ObservedObject var manager: Manager
+    @EnvironmentObject var manager: Manager
     var dots: [Dot]
     var size: CGSize 
-//    public init(manager: Manager){
-//        self.manager = manager
-//    }
-//    
+    @Binding var savePDF: Bool
+
     var canvas : some View {
         Canvas {context, size in                    
             for dotIndex in 0..<dots.count {
@@ -42,14 +40,14 @@ struct DotView: View {
             }
         }.background(content: {Color.white})
     }
+    
     public var body: some View {
         ZStack {
-            //GeometryReader {proxy in
             canvas
-            Button (action: {
+        }.onChange(of: savePDF) { 
+            if savePDF {
                 savePDF(name: "new")
-            }) {
-                Text("save PDF in dot View")
+                savePDF = false
             }
         }
       //  }

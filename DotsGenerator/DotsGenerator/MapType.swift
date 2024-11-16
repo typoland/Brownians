@@ -25,7 +25,7 @@ enum MapType {
     
     case image(image: CIImage, filters: FiltersChain?)
     case function(Functions)
-    case number(value: CGFloat)
+    case number(value: Double)
     
     var name: String {
         switch self {

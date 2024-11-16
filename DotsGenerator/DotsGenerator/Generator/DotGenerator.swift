@@ -33,7 +33,8 @@ actor DotGenerator {
                       //result: inout [Dot],
                       detailMap: @escaping (CGPoint, CGSize) -> Double, 
                       dotSizeMap: @escaping (CGPoint, CGSize) -> Double,
-                      chaos: Double ) async 
+                      chaos: Double,
+                      startAt: CGPoint?) async 
     
     -> Task<[Dot], Never>  
     
@@ -42,7 +43,7 @@ actor DotGenerator {
         return Task { () -> [Dot] in
             //Do not start in same place
             let aroundMiddle: (CGSize) -> CGPoint = { size in
-                let center = CGPoint(x: size.width/2, y: size.height/2)
+                let center = startAt ?? CGPoint(x: size.width/2, y: size.height/2)
                 let r = abs(detailMap(center, size))
                 return center + CGPoint(x: Double.random(in: -r...r),
                                         y: Double.random(in: -r...r))

@@ -11,6 +11,17 @@ struct ContentView: View {
     
     @ObservedObject var manager = Manager()
     @State var refreshPreview: Bool = true
+    @State var refreshDrawing: Bool = false
+    
+    @ViewBuilder
+    var finalView : some View {
+        let size = manager.finalSize
+        DotSizesView(refresh: $refreshDrawing, manager: manager)
+                .frame(width:size.width, 
+                       height: size.height)
+     
+    }
+    
     var body: some View {
         HStack (spacing: 20) {
             VStack {
@@ -23,21 +34,8 @@ struct ContentView: View {
                     ImageSizeView(size: $manager.finalSize)
                 }
                 
-//                var detailMap: (CGSize) -> MapType  = { size in
-//                    return .function(
-//                        Functions.verticalBlend,
-//                        dotSize: DotSize(maxSize: 10, minSize: 6))
-//                    
-//                }
-//                var dotSizeMap: (CGSize) -> MapType = { size in
-//                    return .function(
-//                        Functions.horizontalBlend,
-//                        dotSize: DotSize(maxSize: 10, minSize: 6))
-//                    
-//                }
-                
-                DotSizesView(refresh: $refreshPreview)
-                    .frame(height: 500)
+                DotSizesView(refresh: $refreshPreview, manager: manager)
+                    .frame(height: 200)
                 
                 
                 
@@ -57,21 +55,23 @@ struct ContentView: View {
                 Spacer()
             }.onSubmit {
                 refreshPreview = true
-            }.frame(width: 500)
+            }.frame(width: 300)
             .environmentObject(manager)
             
-            /*
+            
             VStack {
                 ScrollView([.horizontal, .vertical]) {
-                    DotTestView(dots: $manager.dots)
-                        .frame(width: manager.size.width,
-                               height: manager.size.height)
+                    let size = manager.finalSize
+                    finalView
+                        .environmentObject(manager) 
+                        .frame(width:size.width, 
+                               height: size.height)
                 }
                 HStack {
                     Button(action: {
-                        Task {
-                            await manager.updateDots(in: manager.size)
-                        }}, 
+                        
+                        refreshDrawing = true
+                        }, 
                            label: {Text("Start")})
                     Button(action: {
                         print ("stop")
@@ -79,7 +79,7 @@ struct ContentView: View {
                            label: {Text("How to stop?")})
                 }
             }
-             */
+             
         }
         .padding()
         .onChange(of: manager.sizeOwner) {

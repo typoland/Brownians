@@ -20,7 +20,7 @@ class Manager : ObservableObject {
     
     @Published var sizeOwner: SizeOwner = .manager
     
-    @Published var finalSize: CGSize = CGSize(width: 1024, height: 1024)
+    @Published var finalSize: CGSize = CGSize(width: 100, height: 100)
     
     @Published var detailMap: MapType = Defaults.defaultMapImage
     

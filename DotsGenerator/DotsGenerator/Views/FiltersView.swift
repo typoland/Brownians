@@ -24,7 +24,6 @@ struct FiltersView: View {
     func insert(filterName: String, at elementIndex: Int) {
         
         if let filter = try? Filters(name: filterName) {
-            print ("somethin happened \(filter) \(elementIndex)")
             elementIndex > filters.count 
             ? filters.append(filter)
             : filters.insert(filter, at: elementIndex)

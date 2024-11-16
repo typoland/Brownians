@@ -94,7 +94,7 @@ Element.Index == Int {
     func value(at point: CGPoint) -> Double {
         let x = Int(point.x)
         let y = Int(point.y)
-        guard y<=count, x <= self[0].count else {return Double.nan}
+        guard !self.isEmpty, !self[0].isEmpty, y<=count, x <= self[0].count else {return Double.nan}
         return self[y][x]
     }
 }

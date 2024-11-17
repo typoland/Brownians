@@ -10,13 +10,29 @@ import Combine
 
 @MainActor
 class Manager : ObservableObject {
-    enum SizeOwner {
+    
+    enum SizeOwner : Codable {
         case manager
         case detailMap
         case sizeMap
     }
+//    nonisolated required init(from decoder: any Decoder) throws {
+//    
+//    }
+//    
+//    nonisolated func encode(to encoder: any Encoder) throws {
+//    }
     
-    
+    enum CodingKeys: CodingKey {
+        case sizeOwner
+        case finalSize
+        case detailMap
+        case sizeMap
+        case detailSize
+        case dotSize
+        case dots
+        case chaos
+    }
     
     @Published var sizeOwner: SizeOwner = .manager
     

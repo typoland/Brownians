@@ -27,14 +27,14 @@ import MathParser
 
 struct CustomFunction {
     var name: String = "new" 
-    var formula: String = "cos(x / width) * sin(y / height)"
+    var formula: String = "cos(x / w) * sin(y / h)"
        
     func parse() -> (CGPoint, CGSize) -> Double {
         { point, size in
             let variables = ["x": Double(point.x),
                              "y": Double(point.y),
-                             "width": Double(size.width),
-                             "height": Double(size.height)]
+                             "w": Double(size.width),
+                             "h": Double(size.height)]
             //        let funcs: [String: (Double, Double, Double, Double)->Double] = [
             //            "simple" : {cos($0 / $2) * sin($1 / $3)}
             //        ]
@@ -49,7 +49,7 @@ struct CustomFunction {
             
             
             let evaluator = parser.parse(formula)
-            return evaluator?.value ?? Double.nan  }      
+            return evaluator?.value.clamped(to: 0...1) ?? Double.nan  }      
     }
 }
 import SwiftUI
@@ -57,7 +57,8 @@ struct CustomFormulaView: View {
     @Binding var function: CustomFunction
     
     var body: some View {
+        Text ("Use **x**, **y**, **w** and **h**, result values will be clamped to `0...1`").controlSize(.mini)
         TextField("function name", text: $function.name)
-        TextField("formula", text: $function.formula )
+        TextField("formula", text: $function.formula, axis: .vertical)
     }
 }

@@ -46,8 +46,10 @@ struct DotView: View {
             canvas
         }.onChange(of: savePDF) { 
             if savePDF {
-                savePDF(name: "new")
-                savePDF = false
+                if let url = manager.resultsFolderPath {
+                    savePDF(url: url, name: "dots")
+                    savePDF = false
+                }
             }
         }
       //  }

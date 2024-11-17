@@ -49,6 +49,8 @@ class Manager : ObservableObject {
     @Published var dots: [Dot] = []
     
     @Published var chaos: Double = 0.7
+    
+    @Published var resultsFolderPath: URL? = nil
         
     private func mapValue(map: MapType, dotSize: DotSize, in size: CGSize) -> (CGPoint, CGSize) -> Double {
         let valueCount : (CGPoint, CGSize) ->Double

@@ -13,7 +13,7 @@ struct ContentView: View {
     @State var refreshPreview: Bool = true
     @State var refreshDrawing: Bool = false
     @State var savePDF: Bool = false
-  
+    @State var choosePath: Bool = false
     
     
     @ViewBuilder
@@ -29,7 +29,9 @@ struct ContentView: View {
     let largeFont = NSFont.systemFont(ofSize: 60)
     var configuration = NSImage.SymbolConfiguration(textStyle: .body, scale: .large)
   
-    
+    var noPath : Bool {
+        manager.resultsFolderPath == nil
+    }
     var body: some View {
         HStack (spacing: 20) {
             VStack {
@@ -96,8 +98,12 @@ struct ContentView: View {
                     Text("\(manager.finalSize)")
                 
                     Button (action: {
-                        savePDF = true
-                    }, label: {Text("save PDF")})
+                        if noPath {
+                            choosePath = true
+                        } else {
+                            savePDF = true
+                        }
+                    }, label: {Text("\(noPath ? "choose save folder ": "save PDF")")})
                     
                 }.environmentObject(manager)
                 
@@ -116,6 +122,14 @@ struct ContentView: View {
         .onChange(of: manager.sizeOwner) {
             print ("Change \(manager.sizeOwner)")
             manager.updateSizes()
+        }.fileImporter(isPresented: $choosePath, 
+                       allowedContentTypes: [.folder]) { result in
+            switch result {
+            case .success(let success):
+                manager.resultsFolderPath = success
+            case .failure(let failure):
+                manager.resultsFolderPath = nil
+            }
         }
     }
 }

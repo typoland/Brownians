@@ -81,7 +81,7 @@ struct GenerateDotsView: View {
                     .onReceive(generator.updateGeneratorDots) {_ in
                         Task {
                             self.dots = await generator.currentDots()
-                            savePDF = true
+                            
                         }
                         
                     }

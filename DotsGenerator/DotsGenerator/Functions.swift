@@ -29,6 +29,7 @@ struct CustomFunction {
     enum PareserErrors: Error {
         case evaluatorNotCreated
         case unresolved(Set<Substring>)
+        case returnsNan(CGPoint, CGSize)
         
     }
     var name: String = "new" 
@@ -54,14 +55,17 @@ struct CustomFunction {
         }      
     }
     
-    func checkFormula(_ formula: String) -> Result<String, PareserErrors> {
-        let w = 100.0
-        let h = 100.0
-        let size = CGSize(width: w, height: h)
+    func checkFormula(_ formula: String, on size: CGSize) -> Result<String, PareserErrors> {
+        let w = size.width
+        let h = size.height
+        
         var uresolved = Set<Substring>()
-        for p in 0...10 {
-            let point = CGPoint(x: CGFloat.random(in: 0...w), 
-                                y: CGFloat.random(in: 0...h))
+        let testPoints = [CGPoint(x: 0,y: 0),
+                          CGPoint(x: w,y: 0),
+                          CGPoint(x: 0,y: h),
+                          CGPoint(x: w,y: w),
+                          CGPoint(x: w/2,y: h/2),]
+        for point in testPoints {
             let evaluator = parser(point: point, size: size).parse(formula)
             if let evaluator  {
                 uresolved.formUnion(evaluator.unresolved.binaryFunctions)
@@ -70,21 +74,30 @@ struct CustomFunction {
             } else {
                 return .failure(.evaluatorNotCreated)
             }
-            
+            if evaluator?.value == Double.nan {
+                return .failure(.returnsNan(point, size))
+            }
         }
-        if uresolved.isEmpty {
-            return .success(formula)
-        }
-        return .failure(.unresolved(uresolved))
+        //if uresolved.isEmpty {
+        return .success(formula)
+        // }
+    
+        //return .failure(.unresolved(uresolved))
     }
-    func image(size: CGSize) async -> CIImage {
+    func image(size: CGSize, simulate: CGSize) async -> CIImage {
         let width = Int(size.width)
         let height = Int(size.height)
+        let xProp = simulate.width / size.width  
+        let yProp = simulate.height / size.height
         
         var buffer : [UInt8] = []
         for row in 0..<height {
             for column in 0..<width {
-                let val = parse()(CGPoint(x: column, y: row), size) * 255
+                let val = parse()(CGPoint(x: CGFloat(column) * yProp, 
+                         y: CGFloat(height-row) * xProp), 
+                 simulate) 
+                * 255.0
+                
                 buffer.append(val.isNaN ? 0 : UInt8(clamping: Int(Double(val))))
             }
         }
@@ -103,13 +116,13 @@ struct CustomFormulaView: View {
     @State var testFormula: String = ""
     @State var image: CIImage? = nil
     @State var parserErrors : Set<Substring> = []
-    
+    @EnvironmentObject var manager: Manager
     let imageSize = CGSize(width: 25,
                            height: 20)
     
     func updateImage(size: CGSize) {
         Task {
-            image = await function.image(size: format_3_4(size))
+            image = await function.image(size: format_3_4(size), simulate: manager.finalSize)
         }
     }
     func format_3_4(_ size: CGSize) -> CGSize {
@@ -136,7 +149,7 @@ struct CustomFormulaView: View {
                 TextField("formula", text: $testFormula, axis: .vertical)
                     .onSubmit {
                         parserErrors = []
-                        switch function.checkFormula(testFormula) {
+                        switch function.checkFormula(testFormula, on: manager.finalSize) {
                         case .success(let formula): 
                             function.formula = formula
                             updateImage(size: imageSize)
@@ -147,7 +160,10 @@ struct CustomFormulaView: View {
                                 parserErrors = ["evaluator not created"]
                             case .unresolved(let errors):
                                 parserErrors = errors
+                            case .returnsNan(let point, let size):
+                                parserErrors = ["returned .nan for \(point) in \(size)"]
                             }
+                            
                         }
                     }
                     .onAppear {

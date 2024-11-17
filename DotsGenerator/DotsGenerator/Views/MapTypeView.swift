@@ -15,7 +15,7 @@ struct MapTypeView: View {
     var body: some View {
         VStack {
             Text(title)
-            
+            SizesView(dotSize: $dotSize, range: range)
             let nameBinding = Binding(
                 get: {map.name}, 
                 set: {map = MapType($0)})
@@ -23,16 +23,14 @@ struct MapTypeView: View {
             
             switch map {
             case .function(let function):
-                SizesView(dotSize: $dotSize, range: range)
+                
                 let binding = Binding(get: {function}, 
                                       set: {map =  .function($0)})
                 MapFunctionView(function: binding)
                 
             case .image(let image, 
                         let filtersChain):
-                SizesView(dotSize: $dotSize, 
-                          range: range)
-                
+
                 let bindingChain = Binding(
                     get: {filtersChain}, 
                     set: {map = .image(image: image, 

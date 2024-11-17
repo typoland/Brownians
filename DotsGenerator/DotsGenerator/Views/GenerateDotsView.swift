@@ -31,6 +31,7 @@ struct GenerateDotsView: View {
     var generator = DotGenerator()
     @State var generatorTask : Task<[Dot], Never> = Task {[]}
     @State var isDragged : Bool = false
+    
     func start(in size: CGSize, manager: Manager) async {
         generatorTask = await generator
             .makeDotsTask(in: size, 
@@ -80,6 +81,7 @@ struct GenerateDotsView: View {
                     .onReceive(generator.updateGeneratorDots) {_ in
                         Task {
                             self.dots = await generator.currentDots()
+                            savePDF = true
                         }
                         
                     }
@@ -97,7 +99,9 @@ struct GenerateDotsView: View {
 
 #Preview {
     @Previewable @State var refresh: Bool = true
-    GenerateDotsView(refresh: $refresh, savePDF: .constant(false), manager: Manager())
+    GenerateDotsView(refresh: $refresh, 
+                     savePDF: .constant(false), 
+                     manager: Manager())
         .frame(width: 40, height: 40)
         .environmentObject( Manager())
 }

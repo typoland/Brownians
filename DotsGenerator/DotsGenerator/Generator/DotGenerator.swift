@@ -84,6 +84,9 @@ actor DotGenerator {
                     await sendTemporaryResult()
                 }
             } catch {
+#if DEBUG
+                print ("Genrator canceled")
+#endif
               return dots
             }
 #if DEBUG

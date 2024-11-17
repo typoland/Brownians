@@ -11,7 +11,7 @@ import SwiftUI
 extension DotView {
     @MainActor public func savePDF(name: String) {
         
-        let dateString = Date.now.formatted(date:.abbreviated, time:.shortened)
+        let dateString = Date.now.formatted(date:.abbreviated, time: .complete)
         let url = URL(fileURLWithPath: "/Users/lukasz/Desktop/Blendy/\(name) \(dateString).pdf")
         print ("Saving to \(url)")
         let renderer = ImageRenderer(content: canvas.frame(width: size.width, 

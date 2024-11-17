@@ -13,7 +13,7 @@ struct ContentView: View {
     @State var refreshPreview: Bool = true
     @State var refreshDrawing: Bool = false
     @State var savePDF: Bool = false
-    
+  
     
     
     @ViewBuilder
@@ -26,6 +26,9 @@ struct ContentView: View {
                        height: size.height)
      
     }
+    let largeFont = NSFont.systemFont(ofSize: 60)
+    var configuration = NSImage.SymbolConfiguration(textStyle: .body, scale: .large)
+  
     
     var body: some View {
         HStack (spacing: 20) {
@@ -36,9 +39,22 @@ struct ContentView: View {
                                  savePDF: .constant(false), 
                                  manager: manager)
                     .frame(height: 200)
-                
-                
-                
+                Group {
+                    if refreshPreview {
+                        Button(action: {refreshPreview = false}, 
+                               label: {Text("Stop")})
+                    } else {
+                        Text("Preview shows only true detail size, images are scaled down").lineLimit(3).controlSize(.mini)
+                        
+                    }
+                }.frame(maxWidth: .infinity)
+                    .frame(height: 30)
+                HStack {
+                    Text("Chaos:")
+                    EnterTextFiledView("0,5...0,99", 
+                                       value: $manager.chaos,
+                                       in: 0.4...1)
+                }
                 HStack (alignment: .top) {
                     MapTypeView(title: "Detail size",
                                 map: $manager.detailMap, 
@@ -62,12 +78,27 @@ struct ContentView: View {
             VStack {
                 
                 HStack {
-                    Text("\(manager.finalSize)")
-                    Text("Chaos")
-                    EnterTextFiledView("0,5...0,99", 
-                                       value: $manager.chaos,
-                                       in: 0.4...1)
                     ImageSizeView(size: $manager.finalSize)
+                    Spacer(minLength: 200)
+                    
+                    Button(action: {
+                        refreshDrawing.toggle()
+                    }, 
+                           label: {
+                        Text("\(refreshDrawing ? "Stop" : " Start") Render").font(.system(size: 24))
+                        refreshDrawing 
+                        ? Image(systemName: "stop.circle").frame(width: 50, height: 50)
+                        : Image(systemName: "play.rectangle").frame(width: 50,height: 50)
+                    })
+                    .buttonStyle( .borderless )
+                    .controlSize( .extraLarge)
+
+                    Text("\(manager.finalSize)")
+                
+                    Button (action: {
+                        savePDF = true
+                    }, label: {Text("save PDF")})
+                    
                 }.environmentObject(manager)
                 
                 ScrollView([.horizontal, .vertical]) {
@@ -77,18 +108,7 @@ struct ContentView: View {
                         .frame(width:size.width, 
                                height: size.height)
                 }
-                HStack {
-                    Button(action: {
-                        refreshDrawing.toggle()
-                    }, 
-                           label: {Text("\(refreshDrawing ? "⏸️ Stop" : " ▶️ Start") Render")})
-                    .buttonStyle( .borderless )
-                    .controlSize(.extraLarge)
-                    Button (action: {
-                        savePDF = true
-                    }, label: {Text("save PDF")})
-                
-                }
+               
             }
              
         }

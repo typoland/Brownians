@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B253C3BB2CE9E6B800BB9A10 /* MathParser in Frameworks */ = {isa = PBXBuildFile; productRef = B253C3BA2CE9E6B800BB9A10 /* MathParser */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		B2E7F8922CE2136700AFB2BB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B253C3BB2CE9E6B800BB9A10 /* MathParser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = DotsGenerator;
 			packageProductDependencies = (
+				B253C3BA2CE9E6B800BB9A10 /* MathParser */,
 			);
 			productName = DotsGenerator;
 			productReference = B2E7F8802CE2136400AFB2BB /* DotsGenerator.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = B2E7F8772CE2136400AFB2BB;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B253C3B92CE9E6B800BB9A10 /* XCRemoteSwiftPackageReference "swift-math-parser" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B2E7F8812CE2136400AFB2BB /* Products */;
 			projectDirPath = "";
@@ -599,6 +608,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B253C3B92CE9E6B800BB9A10 /* XCRemoteSwiftPackageReference "swift-math-parser" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/bradhowes/swift-math-parser";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.7.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B253C3BA2CE9E6B800BB9A10 /* MathParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B253C3B92CE9E6B800BB9A10 /* XCRemoteSwiftPackageReference "swift-math-parser" */;
+			productName = MathParser;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B2E7F8782CE2136400AFB2BB /* Project object */;
 }

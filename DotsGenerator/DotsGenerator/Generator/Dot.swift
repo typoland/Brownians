@@ -86,10 +86,10 @@ public final actor Dot: Sendable {
     ) async -> [Dot]  {
         //CHECK ZONES
         var dotsAround = await generator.dots.filter {dot in
-            (dot.at |-| at) < (upperBound * lowerBound) && dot.at != at //&& !isFull
+            (dot.at |-| at) < (upperBound * lowerBound) && dot.at != at 
         }
         var newDots: [Dot] = []
-        //ADD first dot
+        //ADD second dot if nothing around
         if dotsAround.isEmpty {
             let angle = Double.random(in: 0...Double.tau)
             let distance = Double.random(in: zone)

@@ -7,8 +7,17 @@
 import SwiftUI
 
 struct MapFunctionView: View {
-    var function: Functions
+    @Binding var function: Functions
     var body: some View {
-        Text("\(String(describing: function))")
+        switch function {
+
+        case .custom(let customFunction):
+            let bindingFuction = Binding(get: {customFunction}, 
+                                  set: {function = .custom($0)})
+            CustomFormulaView(function: bindingFuction)
+        default:
+            Text("\(String(describing: function))")
+        }
+        
     }
 }

@@ -40,8 +40,10 @@ actor DotGenerator {
     
     {
         var generationNr = 0
+        
         return Task { () -> [Dot] in
             //Do not start in the same place
+            
             let aroundMiddle: (CGSize) -> CGPoint = { size in
                 let center = startAt ?? CGPoint(x: size.width/2, y: size.height/2)
                 let r = abs(detailMap(center, size))

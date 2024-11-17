@@ -24,7 +24,9 @@ struct MapTypeView: View {
             switch map {
             case .function(let function):
                 SizesView(dotSize: $dotSize, range: range)
-                MapFunctionView(function: function)
+                let binding = Binding(get: {function}, 
+                                      set: {map =  .function($0)})
+                MapFunctionView(function: binding)
                 
             case .image(let image, 
                         let filtersChain):

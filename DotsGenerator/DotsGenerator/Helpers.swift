@@ -29,6 +29,6 @@ struct Defaults {
         MapType.number(value: 0.5)
     }
     static var defaultMapFunction: MapType {
-        MapType.function(.horizontalBlend)
+        MapType.function(.custom(CustomFunction()))
     }
 }

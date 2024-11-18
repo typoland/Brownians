@@ -29,36 +29,39 @@ actor DotGenerator {
         updateGeneratorDots.send()
     }
     
-    func makeDotsTask(in size: CGSize,
+    
+    
+    func makeDotsTask(in jobSize: CGSize,
                       //result: inout [Dot],
                       detailMap: @escaping (CGPoint, CGSize) -> Double, 
                       dotSizeMap: @escaping (CGPoint, CGSize) -> Double,
                       chaos: Double,
-                      startAt: CGPoint?) async 
+                      startAt: CGPoint) async 
     
     -> Task<[Dot], Never>  
     
     {
+        
         var generationNr = 0
+        dots = []
         
         return Task { () -> [Dot] in
             //Do not start in the same place
             
             let aroundMiddle: (CGSize) -> CGPoint = { size in
-                let center = startAt ?? CGPoint(x: size.width/2, y: size.height/2)
-                let r = abs(detailMap(center, size))
-                return center + CGPoint(x: Double.random(in: -r...r),
+                let r = abs(detailMap(startAt, size))
+                return startAt + CGPoint(x: Double.random(in: -r...r),
                                         y: Double.random(in: -r...r))
             }
             //first dot somewhere in a middle
-            let p = aroundMiddle(size)
+            let p = aroundMiddle(jobSize)
             let dot = Dot(at: p, 
-                          density: detailMap(p, size), 
-                          dotSize: dotSizeMap(p, size))
-            dots = [dot]
+                          density: detailMap(p, jobSize), 
+                          dotSize: dotSizeMap(p, jobSize))
             
+            dots.append(dot)
             //make first dots around
-            var newDots: [Dot] = await dot.addDots(in: size, 
+            var newDots: [Dot] = await dot.addDots(in: jobSize, 
                                                    generator: self, 
                                                    density: detailMap,
                                                    dotSize: dotSizeMap,
@@ -72,7 +75,7 @@ actor DotGenerator {
                     virginDots = []
                     
                     for newDot in newDots {
-                        let z = await newDot.addDots(in: size, 
+                        let z = await newDot.addDots(in: jobSize, 
                                                      generator: self,
                                                      density: detailMap,
                                                      dotSize: dotSizeMap,

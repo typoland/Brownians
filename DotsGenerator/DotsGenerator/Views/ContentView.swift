@@ -127,7 +127,7 @@ struct ContentView: View {
             switch result {
             case .success(let success):
                 manager.resultsFolderPath = success
-            case .failure(let failure):
+            case .failure(_):
                 manager.resultsFolderPath = nil
             }
         }

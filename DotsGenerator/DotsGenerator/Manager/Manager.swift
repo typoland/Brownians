@@ -67,8 +67,8 @@ class Manager: ObservableObject, @preconcurrency Codable {
         let map = map.faltten(to: size)
         switch map {
             
-        case .image(image: let image, _):
-            let grayMap = image.grayMap            
+        case .image(image: let source, _):
+            let grayMap = source.image.grayMap          
             valueCount =  {point, _ in grayMap.value(at: point, for: dotSize.maxSize)}
             
         case .function(let function):
@@ -96,14 +96,14 @@ class Manager: ObservableObject, @preconcurrency Codable {
         case .manager:
             _ = self.finalSize
         case .detailMap:
-            if case .image(let image, _) = detailMap {
-                self.finalSize = image.extent.size
+            if case .image(let source, _) = detailMap {
+                self.finalSize = source.image.extent.size
             } else {
                 sizeOwner = .manager
             }
         case .sizeMap:
-            if case .image(let image, _) = sizeMap {
-                self.finalSize = image.extent.size
+            if case .image(let source, _) = sizeMap {
+                self.finalSize = source.image.extent.size
             } else {
                 //newSize = self.size
                 sizeOwner = .manager

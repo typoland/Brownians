@@ -6,13 +6,13 @@
 //
 import SwiftUI
 struct ImagePicker: View {
-    @Binding var image: CIImage
+    @Binding var imageSource: ImageSource
     @State var isImporting: Bool = false
     @EnvironmentObject var manager: Manager
     
     var body: some View {
         VStack {
-            Image(nsImage: image.nsImage)
+            Image(nsImage: imageSource.image.nsImage)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
             Button (action: {
@@ -26,8 +26,8 @@ struct ImagePicker: View {
                 case .success(let url):
                     // url contains the URL of the chosen file.
                     guard let data = try? Data(contentsOf: url) else {return}
-                    if let new = NSImage(data: data)?.ciImage {
-                        image = new
+                    if let new = NSImage(data: data) {
+                        imageSource = .url(url: url)
                         manager.updateSizes()
                     }
                 case .failure(let error):

@@ -7,15 +7,15 @@
 import SwiftUI
 
 struct MapImageView: View {
-    @Binding var image: CIImage
+    @Binding var imageSource: ImageSource
     @Binding var filters: FiltersChain
    
     var body: some View {
         VStack {
             
-            ImagePicker(image: $image)
+            ImagePicker(imageSource: $imageSource)
             if filters.chain.count > 0,
-                let res = try? filters.result(source: image) {
+               let res = try? filters.result(source: imageSource).image {
                 Image(nsImage: res.nsImage)
                     .resizable()
                     .aspectRatio(contentMode: .fit)

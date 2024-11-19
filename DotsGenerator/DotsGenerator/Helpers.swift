@@ -18,12 +18,14 @@ struct Defaults {
         
     ])
     
-    static var ciImage: CIImage {
-        NSImage(named: "Love")!.ciImage!
+    static var imageSource: ImageSource {
+        .local(name: "Love")
+        //NSImage(named: "Love")!.ciImage!
     }
     
+    
     static var defaultMapImage: MapType {
-        MapType.image(image: Defaults.ciImage, filters: FiltersChain(chain: []))
+        MapType.image(image: Defaults.imageSource, filters: FiltersChain(chain: []))
     }
 
     static var defaultMapFunction: MapType {

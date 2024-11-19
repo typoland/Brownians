@@ -27,15 +27,15 @@ struct FiltersChain: Equatable, Codable {
     
     var chain: [Filter]
     
-    func result(source: CIImage) throws -> CIImage {
-        var result: CIImage? = source
+    func result(source: ImageSource) throws -> ImageSource {
+        var result: CIImage? = source.image
         for filter in chain {
             result = filter.filter(image: result!)
             if result == nil {
                 throw Errors.filterFailed
             }
         }
-        return result!
+        return .flatten(result!)
     }
 }
 

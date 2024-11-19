@@ -16,6 +16,7 @@ struct MapTypeView: View {
         VStack {
             Text(title)
             SizesView(dotSize: $dotSize, range: range)
+            
             let nameBinding = Binding(
                 get: {map.name}, 
                 set: {map = MapType($0)})
@@ -38,8 +39,10 @@ struct MapTypeView: View {
                 let bindingImage = Binding(
                     get: {image}, 
                     set: {map = .image(image: $0, 
-                                       filters: filtersChain)})
-                MapImageView(image: bindingImage, 
+                                       filters: filtersChain)
+                        debugPrint("new map: \(map)")
+                    })
+                MapImageView(imageSource: bindingImage, 
                              filters: bindingChain)
                 
             }
@@ -49,7 +52,7 @@ struct MapTypeView: View {
 
 #Preview {
     @Previewable @State var i = MapType
-        .image(image: Defaults.ciImage, 
+        .image(image: Defaults.imageSource, 
                filters: Defaults.filtersChain)
     @Previewable @State var size = DotSize(minSize: 10, maxSize: 20)
     MapTypeView(title: "test",map: $i, dotSize: $size, range: 0...1000)

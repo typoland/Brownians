@@ -17,10 +17,6 @@ import SwiftUI
 //}
 import Combine
 
-//extension Publisher where Self.Failure ==  Never {
-//    // because the publisher can NEVER FAIL - by design!
-//    public  func sink(receiveValue: @escaping ((Self.Output) -> Void)) -> AnyCancellable {  }
-//}
 
 struct GenerateDotsView: View {
     @Binding var refresh: Bool

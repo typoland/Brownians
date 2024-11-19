@@ -23,7 +23,7 @@ struct Defaults {
     }
     
     static var defaultMapImage: MapType {
-        MapType.image(image: Defaults.ciImage, filters: nil)
+        MapType.image(image: Defaults.ciImage, filters: FiltersChain(chain: []))
     }
     static var defaultMapValue: MapType {
         MapType.number(value: 0.5)

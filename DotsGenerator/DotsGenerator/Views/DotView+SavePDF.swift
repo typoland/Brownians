@@ -12,15 +12,15 @@ extension DotView {
     @MainActor public func savePDF(url: URL, name: String) {
         
         let dateString = Date.now.formatted(date:.abbreviated, time: .complete)
-        let url = url.appending(component: "\(name) \(dateString).pdf")
-//        let url = URL(fileURLWithPath: "/Users/lukasz/Desktop/Blendy/\(name) \(dateString).pdf")
-        print ("Saving to \(url)")
+        let pdfUrl = url.appending(component: "\(name) \(dateString).pdf")
+
+        print ("Saving to \(pdfUrl)")
         let renderer = ImageRenderer(content: canvas.frame(width: size.width, 
                                                            height: size.height) ) 
 
         
         //https://www.swiftanytime.com/blog/imagerenderer-in-swiftui
-        if let consumer = CGDataConsumer(url: url as CFURL), 
+        if let consumer = CGDataConsumer(url: pdfUrl as CFURL), 
             let context = CGContext(consumer: consumer, mediaBox: nil, nil) {
             renderer.render { size, renderer in
                 var mediaBox = CGRect(origin: .zero, size: size)
@@ -35,6 +35,7 @@ extension DotView {
             }
         }
         //*/
-        print ("saved to \(url)")
+       
+        print ("saved to \(pdfUrl)")
     } 
 }

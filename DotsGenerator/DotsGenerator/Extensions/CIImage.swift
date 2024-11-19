@@ -87,6 +87,7 @@ public extension CIImage {
     }
 }
 
+
 extension Array where 
 Element : Collection, 
 Element.Element == Double,

@@ -7,11 +7,45 @@
 import Foundation
 typealias DotFunction = (CGPoint) -> Double
 
-enum Functions {
+enum Functions: Codable {
     case horizontalBlend
     case verticalBlend
     case custom(CustomFunction)
+    enum CodingKeys: CodingKey {
+        case name
+        case custom
+    }
+    enum Errors: Error {
+        case noName(String)
+        case noKey(String)
+    }
+    init(from decoder: any Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        if let name = try? c.decode(String.self, forKey: .name) {
+            switch name {
+            case "horizontalBlend": self = .horizontalBlend
+            case "verticalBlend": self = .verticalBlend
+            default: throw Errors.noName(name)
+            }
+        } else if let custom = try? c.decode(CustomFunction.self, forKey: .custom) {
+            self = .custom(custom)
+        } else {
+            throw Errors.noKey("\(c.allKeys)")
+        }
+    }
     
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+            
+        case .horizontalBlend:
+            try container.encode("horizontalBlend", forKey: .name)
+        case .verticalBlend:
+            try container.encode("verticalBlend", forKey: .name)
+        case .custom(let customFunction):
+            try container.encode(customFunction, forKey: .custom)
+        }
+    }
     func inSize(_ size: CGSize) -> DotFunction {
         switch self {
         case .verticalBlend:
@@ -25,7 +59,7 @@ enum Functions {
 }
 import MathParser
 //https://github.com/bradhowes/swift-math-parser?tab=readme-ov-file
-struct CustomFunction {
+struct CustomFunction: Codable {
     enum PareserErrors: Error {
         case evaluatorNotCreated
         case unresolved(Set<Substring>)

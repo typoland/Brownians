@@ -9,19 +9,35 @@ import CoreImage
 import Combine
 
 @MainActor
-class Manager : ObservableObject {
+class Manager : ObservableObject, @preconcurrency Codable {
     
-    enum SizeOwner : Codable {
+    enum SizeOwner : String, Codable {
         case manager
         case detailMap
         case sizeMap
     }
-//    nonisolated required init(from decoder: any Decoder) throws {
-//    
-//    }
-//    
-//    nonisolated func encode(to encoder: any Encoder) throws {
-//    }
+    
+    required init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.sizeOwner = try container.decode(SizeOwner.self, forKey: .sizeOwner)
+        self.finalSize = try container.decode(CGSize.self, forKey: .finalSize)
+        self.detailMap = try container.decode(MapType.self, forKey: .detailMap)
+        self.sizeMap = try container.decode(MapType.self, forKey: .sizeMap)
+        self.detailSize = try container.decode(DotSize.self, forKey: .detailSize)
+        self.dotSize = try container.decode(DotSize.self, forKey: .dotSize)
+        self.chaos = try container.decode(Double.self, forKey: .chaos)
+    }
+    
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(sizeOwner, forKey: .sizeOwner)
+        try container.encode(finalSize, forKey: .finalSize)
+        try container.encode(detailMap, forKey: .detailMap)
+        try container.encode(sizeMap, forKey: .sizeMap)
+        try container.encode(detailSize, forKey: .detailSize)
+        try container.encode(dotSize, forKey: .dotSize)
+        try container.encode(chaos, forKey: .chaos)
+    }
     
     enum CodingKeys: CodingKey {
         case sizeOwner
@@ -33,23 +49,16 @@ class Manager : ObservableObject {
         case dots
         case chaos
     }
+    init () {}
     
     @Published var sizeOwner: SizeOwner = .manager
-    
     @Published var finalSize: CGSize = CGSize(width: 800, height: 600)
-    
     @Published var detailMap: MapType = Defaults.defaultMapImage
-    
     @Published var sizeMap: MapType = Defaults.defaultMapImage
-    
     @Published var detailSize = DotSize(minSize: 4, maxSize: 6)
-    
     @Published var dotSize = DotSize(minSize: 0.2, maxSize: 0.7)
-    
     @Published var dots: [Dot] = []
-    
     @Published var chaos: Double = 0.7
-    
     @Published var resultsFolderPath: URL? = nil
         
     private func mapValue(map: MapType, dotSize: DotSize, in size: CGSize) -> (CGPoint, CGSize) -> Double {
@@ -80,7 +89,6 @@ class Manager : ObservableObject {
     -> (CGPoint, CGSize) -> Double {
         mapValue(map: sizeMap, dotSize: dotSize, in: size)
     }
-
     
     func updateSizes() {
         switch sizeOwner {

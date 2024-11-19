@@ -11,7 +11,7 @@ import Combine
 
 //let updateGeneratorDots = PassthroughSubject<[Dot], Never>()
 
-actor DotGenerator {
+actor DotGenerator: Sendable {
     @MainActor
     let updateGeneratorDots = PassthroughSubject<Void, Never>()
     

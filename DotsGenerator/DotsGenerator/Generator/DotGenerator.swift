@@ -44,6 +44,9 @@ actor DotGenerator: Sendable {
         
         var generationNr = 0
         dots = []
+#if DEBUG
+        let start = Date.now
+#endif
         
         return Task { () -> [Dot] in
             //Do not start in the same place
@@ -84,6 +87,11 @@ actor DotGenerator: Sendable {
                     }
                     newDots = virginDots
                     generationNr += 1
+#if DEBUG
+                    let duration = Date.now.timeIntervalSince(start)
+                    let s = duration.formatted(.number.precision(.fractionLength(16)))
+                    print ("\(s)\t\(newDots.count)") 
+#endif
                     await sendTemporaryResult()
                 }
             } catch {
@@ -93,7 +101,8 @@ actor DotGenerator: Sendable {
               return dots
             }
 #if DEBUG
-            print ("Generator At the end Done \(dots.count) in \(generationNr) generations")
+            let duration = Date.now.timeIntervalSince(start)
+            print ("Generator At the end Done \(dots.count) dots in \(generationNr) generations\ntime \(duration._0001) area: \(jobSize.width * jobSize.height)")
 #endif
 //            run = false
             return dots

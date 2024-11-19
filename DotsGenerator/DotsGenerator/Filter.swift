@@ -7,12 +7,13 @@
 import CoreImage
 import AppKit
 
-enum Filter: CaseIterable, Identifiable, Equatable, Codable {
+enum Filter: CaseIterable, Identifiable, Equatable, Codable, Hashable {
     typealias ID = String
     
     var id: String {
         self.name
     }
+    
     enum Errors: Error {
         case noFilter(name: String)
         case noCodingKey
@@ -29,8 +30,6 @@ enum Filter: CaseIterable, Identifiable, Equatable, Codable {
             min: NSColor(red:0.0, green:0.0, blue:0.0, alpha: 0.0), 
             max: NSColor(red:1.0, green:1.0, blue:1.0, alpha: 1.0)),
         .enhancer(amount: 4.0)
-       
-        
     ]
     
     enum FilterCodingKeys: CodingKey {
@@ -47,9 +46,7 @@ enum Filter: CaseIterable, Identifiable, Equatable, Codable {
         else {throw (Errors.noFilter(name: name))}
         self = existing
     }
-    
-    
-    
+
     init(from decoder: any Decoder) throws {
         func nsColor(_ array: [Double]) -> NSColor {
             NSColor(red: array[0], 

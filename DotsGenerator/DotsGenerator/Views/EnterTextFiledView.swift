@@ -45,7 +45,10 @@ where T : FloatingPoint {
             .onChange(of: focused) {
                 if !focused {checkRangeAndAssign()}
             }
-            
+            .onChange(of: value) {
+                print ("CHANGED VALUE")
+                local = value
+            }
     }
 }
 

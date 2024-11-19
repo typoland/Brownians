@@ -73,7 +73,6 @@ class Manager: ObservableObject, @preconcurrency Codable {
             
         case .function(let function):
             valueCount = {point, size in function.inSize(size)(point)}
-            
         }
         
         return {point, size in

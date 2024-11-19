@@ -29,11 +29,11 @@ struct Defaults {
     }
 
     static var defaultMapFunction: MapType {
-        MapType.function(.custom(CustomFunction()))
+        MapType.function(function: CustomFunction())
     }
     
     static var defaultMapValue: MapType {
-        MapType.function(.custom(CustomFunction()))
+        MapType.function(function: CustomFunction())
     }
 }
 

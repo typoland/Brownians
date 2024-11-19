@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct ManagerSetupView: View {
+    @ObservedObject var manager: Manager
     @State var refreshPreview: Bool = true
     @State var openSetup: Bool = false
     @State var saveSetup: Bool = false
-    @EnvironmentObject var manager: Manager
+    
     @State var info: String = ""
     @State var timeElapsed: Bool = false
      
@@ -27,6 +28,7 @@ struct ManagerSetupView: View {
             
             GenerateDotsView(refresh: $refreshPreview, 
                              savePDF: .constant(false))
+            .environmentObject(manager)
             .frame(height: 180)
             Group {
                 if refreshPreview {
@@ -50,15 +52,17 @@ struct ManagerSetupView: View {
                             map: $manager.detailMap, 
                             dotSize: $manager.detailSize ,
                             range: 2...Double.infinity)
+                .environmentObject(manager)
                 Divider()
                 MapTypeView(title: "Dot size",
                             map: $manager.sizeMap, 
                             dotSize:$manager.dotSize ,
                             range: 0...1)
-                
-                
+                .environmentObject(manager)
+
             }
-            }.onSubmit {
+            }
+            .onSubmit {
                 refreshPreview = true
             }
             Spacer()
@@ -140,6 +144,5 @@ struct ManagerSetupView: View {
 }
 
 #Preview {
-    ManagerSetupView()
-        .environmentObject(Manager())
+    ManagerSetupView(manager: Manager())
 }

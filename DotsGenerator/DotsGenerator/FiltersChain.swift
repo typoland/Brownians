@@ -7,7 +7,7 @@
 import CoreImage
 import AppKit
 
-struct FiltersChain: Equatable, Codable {
+struct FiltersChain: Equatable, Codable, Hashable {
     
     nonisolated public static func == (lhs: FiltersChain, rhs: FiltersChain) -> Bool {
         lhs.chain == rhs.chain
@@ -43,6 +43,4 @@ extension FiltersChain: CustomStringConvertible {
     public var description: String {
         "\(chain.count) filters"
     }
-    
-    
 }

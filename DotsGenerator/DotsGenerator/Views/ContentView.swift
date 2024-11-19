@@ -15,17 +15,17 @@ struct ContentView: View {
     @State var savePDF: Bool = false
     @State var choosePath: Bool = false
    
-    
-    
     @ViewBuilder
     var finalView : some View {
         let size = manager.finalSize
         GenerateDotsView(refresh: $refreshDrawing, 
                          savePDF: $savePDF)
+        .environmentObject(manager)
                 .frame(width:size.width, 
                        height: size.height)
      
     }
+    
     let largeFont = NSFont.systemFont(ofSize: 60)
     var configuration = NSImage.SymbolConfiguration(textStyle: .body, scale: .large)
   
@@ -36,14 +36,13 @@ struct ContentView: View {
     var body: some View {
         HStack (spacing: 20) {
             
-            ManagerSetupView()
-                
+            ManagerSetupView(manager: manager)
                 .frame(width: 350)            
             VStack {
                 
                 HStack {
                     ImageSizeView(size: $manager.finalSize)
-                    Spacer(minLength: 200)
+                    Spacer(minLength: 100)
                     
                     Button(action: {
                         refreshDrawing.toggle()
@@ -67,7 +66,7 @@ struct ContentView: View {
                         }
                     }, label: {Text("\(noPath ? "choose save folder ": "save PDF")")})
                     
-                }
+                }.environmentObject(manager)
                 
                 ScrollView([.horizontal, .vertical]) {
                     let size = manager.finalSize
@@ -76,7 +75,7 @@ struct ContentView: View {
                                height: size.height)
                 }
             }
-        }.environmentObject(manager)
+        }
         .padding()
         .onChange(of: manager.sizeOwner) {
             print ("Change \(manager.sizeOwner)")

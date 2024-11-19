@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct FiltersView: View {
-    @Binding var filters: [Filters]
+    @Binding var filters: [Filter]
     
     func bindFilters(index: Int) -> Binding<Optional<String>> {
         Binding(
@@ -23,7 +23,7 @@ struct FiltersView: View {
     
     func insert(filterName: String, at elementIndex: Int) {
         
-        if let filter = try? Filters(name: filterName) {
+        if let filter = try? Filter(name: filterName) {
             elementIndex > filters.count 
             ? filters.append(filter)
             : filters.insert(filter, at: elementIndex)

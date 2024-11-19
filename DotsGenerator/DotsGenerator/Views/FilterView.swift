@@ -10,7 +10,7 @@ import SwiftUI
 
 
 struct FilterView : View {
-    @Binding var filter: Filters 
+    @Binding var filter: Filter 
     var body: some View {
         
         VStack (alignment: .leading, spacing: 5) {

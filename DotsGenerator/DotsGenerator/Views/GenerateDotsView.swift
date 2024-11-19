@@ -21,7 +21,7 @@ import Combine
 struct GenerateDotsView: View {
     @Binding var refresh: Bool
     @Binding var savePDF: Bool
-    @ObservedObject var manager: Manager
+    @EnvironmentObject var manager: Manager
     @State var dots: [Dot] = []
     @State var startPoint : CGPoint = CGPoint()
     var generator = DotGenerator()
@@ -52,6 +52,7 @@ struct GenerateDotsView: View {
         ZStack {
             GeometryReader {proxy in
                 DotView(dots: dots, size: proxy.size, savePDF: $savePDF)
+                    
                     .frame(width: proxy.size.width, height: proxy.size.height)
                     .background(refresh ? Color.red : Color.white)
                     .onAppear {
@@ -96,8 +97,8 @@ struct GenerateDotsView: View {
 #Preview {
     @Previewable @State var refresh: Bool = true
     GenerateDotsView(refresh: $refresh, 
-                     savePDF: .constant(false), 
-                     manager: Manager())
+                     savePDF: .constant(false)) 
+    .environmentObject(Manager())
         .frame(width: 40, height: 40)
-        .environmentObject( Manager())
+       
 }

@@ -18,8 +18,8 @@ struct FiltersChooser : View {
                 if filterName == nil {
                     Text ("").tag(nil as Optional<String>)
                 }
-                ForEach( (0..<Filters.names.count).indices, id:\.self) {index in
-                    let name = Filters.names[index]
+                ForEach( (0..<Filter.names.count).indices, id:\.self) {index in
+                    let name = Filter.names[index]
                     Text(name).tag(name as Optional)
                 }
             } label: {

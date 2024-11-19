@@ -19,13 +19,13 @@ struct FiltersChain: Equatable, Codable {
     
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.chain = try container.decode([Filters].self, forKey: .chain)
+        self.chain = try container.decode([Filter].self, forKey: .chain)
     }
-    init(chain: [Filters]) {
+    init(chain: [Filter]) {
         self.chain = chain
     }
     
-    var chain: [Filters]
+    var chain: [Filter]
     
     func result(source: CIImage) throws -> CIImage {
         var result: CIImage? = source

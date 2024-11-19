@@ -67,7 +67,7 @@ struct CustomFunction: Codable {
         
     }
     var name: String = "new" 
-    var formula: String = "sin(x/(w/pi/12))/2 + 0.5"
+    var formula: String = "0.5"
     func parser(point: CGPoint, size:CGSize) ->  MathParser {
         let variables = ["x": Double(point.x),
                          "y": Double(point.y),

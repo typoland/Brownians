@@ -39,3 +39,15 @@ extension Manager: @preconcurrency Transferable {
     }
     
 }
+
+extension Manager: @preconcurrency CustomStringConvertible {
+    var description: String {"""
+Manager chaos: \(chaos)
+detail Map:    \(detailMap)
+detail Size:   \(detailSize)
+size Map:      \(sizeMap)
+dot size:      \(dotSize)
+size owner:    \(sizeOwner) \(finalSize)
+"""
+    }
+}

@@ -25,10 +25,18 @@ struct Defaults {
     static var defaultMapImage: MapType {
         MapType.image(image: Defaults.ciImage, filters: FiltersChain(chain: []))
     }
-    static var defaultMapValue: MapType {
-        MapType.number(value: 0.5)
-    }
+
     static var defaultMapFunction: MapType {
         MapType.function(.custom(CustomFunction()))
     }
+    
+    static var defaultMapValue: MapType {
+        MapType.function(.custom(CustomFunction()))
+    }
+}
+
+func debugPrint(_ s : String...) {
+#if DEBUG
+    print ("Debug:", s.reduce(into:"", {$0+=" \($1)"}))
+#endif
 }

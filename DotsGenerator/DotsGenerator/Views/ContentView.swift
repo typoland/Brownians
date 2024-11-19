@@ -21,8 +21,7 @@ struct ContentView: View {
     var finalView : some View {
         let size = manager.finalSize
         GenerateDotsView(refresh: $refreshDrawing, 
-                         savePDF: $savePDF, 
-                         manager: manager)
+                         savePDF: $savePDF)
                 .frame(width:size.width, 
                        height: size.height)
      
@@ -38,7 +37,7 @@ struct ContentView: View {
         HStack (spacing: 20) {
             
             ManagerSetupView()
-                .environmentObject(manager)
+                
                 .frame(width: 350)            
             VStack {
                 
@@ -68,17 +67,16 @@ struct ContentView: View {
                         }
                     }, label: {Text("\(noPath ? "choose save folder ": "save PDF")")})
                     
-                }.environmentObject(manager)
+                }
                 
                 ScrollView([.horizontal, .vertical]) {
                     let size = manager.finalSize
                     finalView
-                        .environmentObject(manager) 
                         .frame(width:size.width, 
                                height: size.height)
                 }
             }
-        }
+        }.environmentObject(manager)
         .padding()
         .onChange(of: manager.sizeOwner) {
             print ("Change \(manager.sizeOwner)")

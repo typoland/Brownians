@@ -43,7 +43,8 @@ struct SizeOwnerChooser: View {
     @EnvironmentObject var manager: Manager
     var body: some View {
         //Text("Debug")
-        Picker("", selection: $manager.sizeOwner) {
+        Picker("", selection: Binding(get: {manager.sizeOwner}, 
+                                      set: {manager.sizeOwner = $0}) ) {
             Text("program")
                 .tag(Manager.SizeOwner.manager)
             if case .image(_,_) = manager.detailMap {

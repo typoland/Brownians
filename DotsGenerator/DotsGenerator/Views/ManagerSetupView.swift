@@ -13,50 +13,51 @@ struct ManagerSetupView: View {
     @State var saveSetup: Bool = false
     @EnvironmentObject var manager: Manager
     @State var info: String = ""
-    //@State var timeElapsed: Bool = false
+    @State var timeElapsed: Bool = false
      
     func setInfo(_ txt: String) async {
         print (txt)
         info = txt
         try? await Task.sleep(nanoseconds: 7_500_000_000)
-        info = ""
     }
     
     
     var body: some View {
         VStack {
+            
             GenerateDotsView(refresh: $refreshPreview, 
-                             savePDF: .constant(false), 
-                             manager: manager)
+                             savePDF: .constant(false))
             .frame(height: 180)
             Group {
                 if refreshPreview {
                     Button(action: {refreshPreview = false}, 
                            label: {Text("Stop")})
                 } else {
-                    Text("Preview shows only true detail size, images are scaled down").lineLimit(3).controlSize(.mini)
+                    Text("Preview shows only true detail size, images are scaled down to fit").lineLimit(3).controlSize(.mini)
                     
                 }
             }.frame(maxWidth: .infinity)
                 .frame(height: 30)
+            VStack {
             HStack {
                 Text("Chaos:")
                 EnterTextFiledView("0,5...0,99", 
                                    value: $manager.chaos,
                                    in: 0.4...1)
             }
-            HStack (alignment: .top) {
+            HStack (alignment: .top, spacing: 12) {
                 MapTypeView(title: "Detail size",
                             map: $manager.detailMap, 
-                            dotSize: $manager.detailSize,
+                            dotSize: $manager.detailSize ,
                             range: 2...Double.infinity)
+                Divider()
                 MapTypeView(title: "Dot size",
                             map: $manager.sizeMap, 
-                            dotSize: $manager.dotSize,
+                            dotSize:$manager.dotSize ,
                             range: 0...1)
                 
                 
-                
+            }
             }.onSubmit {
                 refreshPreview = true
             }
@@ -80,13 +81,8 @@ struct ManagerSetupView: View {
                         let decoder = JSONDecoder()
                         let data = try Data(contentsOf: url)
                         let newManager = try decoder.decode(Manager.self, from: data)
-                        print ("-----------")
-                        print (manager.sizeOwner ," — ", newManager.sizeOwner)
-                        print (manager.finalSize ," — ", newManager.finalSize)
-                        print (manager.sizeMap ," — ", newManager.sizeMap)
-                        print (manager.detailMap ," — ", newManager.detailMap)
-                        print (manager.dotSize ," — ", newManager.dotSize)
-                        print (manager.chaos ," — ", newManager.chaos)
+                        print ("-----old Manager------")
+                        print (manager)
                         print ("-----------")
                         
                         if case .image(_, let importedFilters) = newManager.detailMap,
@@ -103,15 +99,13 @@ struct ManagerSetupView: View {
                         print ("update manager")
                         manager.update(from: newManager)
                         
+                        print ("****** manager *******")
+                        print (manager)
                         print ("*************")
-                        print (manager.sizeOwner ," — ", newManager.sizeOwner)
-                        print (manager.finalSize ," — ", newManager.finalSize)
-                        print (manager.sizeMap ," — ", newManager.sizeMap)
-                        print (manager.detailMap ," — ", newManager.detailMap)
-                        print (manager.dotSize ," — ", newManager.dotSize)
-                        print (manager.chaos ," — ", newManager.chaos)
-                        print ("*************")
-                        
+                        refreshPreview = true
+                        Task {
+                            await setInfo("OK")
+                        }
                         
                     } catch {
                         Task {
@@ -138,7 +132,7 @@ struct ManagerSetupView: View {
                     }
                 }
             }
-            Text ("\(info)").animation(.easeInOut)
+            Text ("\(timeElapsed ? info : manager.description)").animation(.easeInOut)
             
         }
         

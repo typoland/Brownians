@@ -7,7 +7,7 @@
 import CoreImage
 import AppKit
 
-enum Filters: CaseIterable, Identifiable, Equatable, Codable {
+enum Filter: CaseIterable, Identifiable, Equatable, Codable {
     typealias ID = String
     
     var id: String {
@@ -18,7 +18,7 @@ enum Filters: CaseIterable, Identifiable, Equatable, Codable {
         case noCodingKey
     }
     
-    static let allCases: [Filters] =
+    static let allCases: [Filter] =
     [
         .gaussianBlur(radius: 10.0),
         .invert,
@@ -33,7 +33,7 @@ enum Filters: CaseIterable, Identifiable, Equatable, Codable {
         
     ]
     
-    enum MainCodingKeys: CodingKey {
+    enum FilterCodingKeys: CodingKey {
         case colorMonochrome
         case morfologyGradient
         case colorClamp
@@ -43,7 +43,7 @@ enum Filters: CaseIterable, Identifiable, Equatable, Codable {
     }
     
     init (name: String) throws {
-        guard let existing = Filters.allCases.first(where: {$0.name == name})
+        guard let existing = Filter.allCases.first(where: {$0.name == name})
         else {throw (Errors.noFilter(name: name))}
         self = existing
     }
@@ -57,34 +57,47 @@ enum Filters: CaseIterable, Identifiable, Equatable, Codable {
                     blue: array[2], 
                     alpha: array[3])
         }
-        let container = try decoder.container(keyedBy: MainCodingKeys.self) 
+        debugPrint ("init some Filter")
+        let container = try decoder.container(keyedBy: FilterCodingKeys.self) 
+        debugPrint ("...container: \(container.allKeys)")
         
         if let sub = try? container.nestedContainer(keyedBy: Monochrome.self, 
                                                     forKey: .colorMonochrome) {
+            debugPrint("maybe Monochrome \(sub)")
             let colorArr = try sub.decode([Double].self, forKey: .color)
             let intesity = try sub.decode(Double.self, forKey: .intensity)
             self = .colorMonochrome(color: nsColor(colorArr), intensity: intesity)
             
-        } else  if let sub = try? decoder.container(keyedBy: MorfologyGradient.self) {
+            
+        } else if let sub = try? container.nestedContainer(keyedBy: MorfologyGradient.self, 
+                                                           forKey: .morfologyGradient) {
+            debugPrint("maybe Morfology \(sub)")
             let radius = try sub.decode(Double.self, forKey: .radius)
             self = .morfologyGradient(radius: radius)
             
-        } else  if let sub = try? decoder.container(keyedBy: ColorClamp.self) {
+        } else  if let sub = try? container.nestedContainer(keyedBy: ColorClamp.self, 
+                                                            forKey: .colorClamp) {
+            debugPrint("maybe ColorClamp \(sub)")
             let min = try sub.decode([Double].self, forKey: .min)
             let max = try sub.decode([Double].self, forKey: .max)
             self = .colorClamp(min: nsColor(min), max: nsColor(max))
             
-        } else  if let sub = try? decoder.container(keyedBy: GaussianBlur.self) {
+        } else  if let sub = try? container.nestedContainer(keyedBy: GaussianBlur.self, 
+                                                            forKey: .gaussianBlur) {
+            debugPrint("maybe Gaussian Blur \(sub)")
             let radius = try sub.decode(Double.self, forKey: .radius)
             self = .gaussianBlur(radius: radius)
             
-        } else  if let _ = try? decoder.container(keyedBy: Invert.self) {
+        } else  if let sub = try? container.nestedContainer(keyedBy: Invert.self, 
+                                                            forKey: .invert) {
+            debugPrint("maybe Invert \(sub)")
             self = .invert
             
         } else {
+            debugPrint("ANY, Throw error")
             throw Errors.noCodingKey
         }
-       
+        debugPrint(self)
     }
 
     enum Monochrome: CodingKey {
@@ -123,7 +136,7 @@ enum Filters: CaseIterable, Identifiable, Equatable, Codable {
             ]
         }
         
-        var container = encoder.container(keyedBy: MainCodingKeys.self)
+        var container = encoder.container(keyedBy: FilterCodingKeys.self)
         switch self {
             
         case .colorMonochrome(color: let color, intensity: let intensity):
@@ -177,7 +190,7 @@ enum Filters: CaseIterable, Identifiable, Equatable, Codable {
         }
     }
     static var names: [String] {
-        Filters.allCases.map {$0.name}
+        Filter.allCases.map {$0.name}
     }
     
     

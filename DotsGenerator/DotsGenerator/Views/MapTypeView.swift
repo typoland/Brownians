@@ -42,21 +42,15 @@ struct MapTypeView: View {
                 MapImageView(image: bindingImage, 
                              filters: bindingChain)
                 
-            case .number(value: let value):
-                let binding = Binding(get: {value}, 
-                                      set: {map = .number(value: $0)})
-                MapValueView(value: binding) 
             }
         }
     }
 }
 
 #Preview {
-    @Previewable @State var v = MapType.number(value: 0.5)
     @Previewable @State var i = MapType
         .image(image: Defaults.ciImage, 
                filters: Defaults.filtersChain)
-    @Previewable @State var f = MapType.number(value: 0.5)
     @Previewable @State var size = DotSize(minSize: 10, maxSize: 20)
     MapTypeView(title: "test",map: $i, dotSize: $size, range: 0...1000)
 }

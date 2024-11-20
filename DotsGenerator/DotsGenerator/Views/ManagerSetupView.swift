@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct ManagerSetupView: View {
-    @ObservedObject var manager: Manager
-    @Binding var didChange: Bool
+    
+    @EnvironmentObject var manager: Manager
+
     @State var refreshPreview: Bool = true
     @State var openSetup: Bool = false
     @State var saveSetup: Bool = false
@@ -31,6 +32,7 @@ struct ManagerSetupView: View {
                              savePDF: .constant(false))
             .environmentObject(manager)
             .frame(height: 180)
+            
             Group {
                 if refreshPreview {
                     Button(action: {refreshPreview = false}, 
@@ -42,8 +44,10 @@ struct ManagerSetupView: View {
                     }
                     
                 }
-            }.frame(maxWidth: .infinity)
-                .frame(height: 30)
+            }
+            //.frame(maxWidth: .infinity)
+            .frame(height: 30)
+            
             VStack {
             HStack {
                 Text("Chaos:")
@@ -55,12 +59,12 @@ struct ManagerSetupView: View {
                 MapTypeView(title: "Detail size",
                             map: $manager.detailMap, 
                             dotSize: $manager.detailSize, 
-                            range: 2...Double.infinity)
+                            range: 2...1000)
                 .environmentObject(manager)
                 Divider()
                 MapTypeView(title: "Dot size",
                             map: $manager.sizeMap, 
-                            dotSize:$manager.dotSize, 
+                            dotSize: $manager.dotSize, 
                             range: 0...1)
                 .environmentObject(manager)
 
@@ -71,7 +75,6 @@ struct ManagerSetupView: View {
                 Task {
                     try?  await Task.sleep(nanoseconds: 1_000_000)
                     refreshPreview = true
-                    didChange.toggle()
                 }
             }
             Spacer()
@@ -156,6 +159,6 @@ struct ManagerSetupView: View {
 }
 
 #Preview {
-    ManagerSetupView(manager: Manager(),
-                     didChange: .constant(false))
+    ManagerSetupView()
+        .environmentObject(Manager())
 }

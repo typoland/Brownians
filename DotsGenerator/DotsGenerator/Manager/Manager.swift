@@ -17,15 +17,15 @@ class Manager: ObservableObject, @preconcurrency Codable {
         case sizeMap
     }
     
-    var sizeOwner: SizeOwner = .manager
-    var finalSize: CGSize = CGSize(width: 800, height: 600)
-    var detailMap: MapType = Defaults.defaultMapImage
-    var sizeMap: MapType = Defaults.defaultMapImage
-    var detailSize = DotSize(minSize: 4, maxSize: 6)
-    var dotSize = DotSize(minSize: 0.2, maxSize: 0.7)
-    var dots: [Dot] = []
-    var chaos: Double = 0.7
-    var resultsFolderPath: URL? = nil
+    @Published var sizeOwner: SizeOwner = .manager
+    @Published var finalSize: CGSize = CGSize(width: 800, height: 600)
+    @Published var detailMap: MapType = Defaults.defaultMapImage
+    @Published var sizeMap: MapType = Defaults.defaultMapImage
+    @Published var detailSize = DotSize(minSize: 4, maxSize: 6)
+    @Published var dotSize = DotSize(minSize: 0.2, maxSize: 0.7)
+    @Published var dots: [Dot] = []
+    @Published var chaos: Double = 0.7
+    @Published var resultsFolderPath: URL? = nil
     
     required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

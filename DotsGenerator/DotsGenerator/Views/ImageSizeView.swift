@@ -8,22 +8,26 @@
 import SwiftUI
 
 struct ImageSizeView: View {
+    
     @Binding var size: CGSize
     @EnvironmentObject var manager: Manager
+    
     var body: some View {
         HStack {
             let disabled = manager.sizeOwner != .manager
             Text("width:")  
             
             EnterTextFiledView("width",
-                               value: $size.width,
+                               value: Binding(get: {Double(size.width)}, 
+                                              set: {size.width = $0}),
                                in: 0...10000)
             .disabled(disabled)
             
             
             Text("height:")
             EnterTextFiledView("height",
-                               value: $size.height,
+                               value: Binding(get: {Double(size.height)}, 
+                                              set: {size.height = $0}),
                                in: 0...10000)
             .disabled(disabled)
             

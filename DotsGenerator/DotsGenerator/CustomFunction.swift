@@ -82,9 +82,9 @@ struct CustomFunction: Codable, Hashable {
         let height = Int(simulate.height / prop)
         
         var buffer : [UInt8] = []
-        for row in 0..<height {
+        for row in (0..<height).reversed() {
             for column in 0..<width {
-                let val = 255.0 - (parse()(CGPoint(x: CGFloat(column) * prop, 
+                let val = (parse()(CGPoint(x: CGFloat(column) * prop, 
                          y: CGFloat(height-row) * prop), 
                  simulate) 
                 * 255.0)

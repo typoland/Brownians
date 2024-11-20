@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @ObservedObject var manager = Manager()
+    @ObservedObject var manager: Manager
     
     @State var refreshDrawing: Bool = false
     @State var savePDF: Bool = false
@@ -37,11 +37,11 @@ struct ContentView: View {
     var body: some View {
         HStack (spacing: 20) {
             
-            ManagerSetupView(manager: manager, 
-                             didChange: $somethingChanged)
-                .frame(width: 350)            
+            ManagerSetupView()
+                .environmentObject(manager)
+                .frame(width: 350) 
+            
             VStack {
-                
                 HStack {
                     ImageSizeView(size: $manager.finalSize)
                     Spacer(minLength: 100)
@@ -97,5 +97,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(manager: Manager())
 }

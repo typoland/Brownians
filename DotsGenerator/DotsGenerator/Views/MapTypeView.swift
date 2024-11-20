@@ -11,6 +11,7 @@ struct MapTypeView: View {
     var title: String
     @Binding var map: MapType
     @Binding var dotSize: DotSize
+    
     var range: ClosedRange<Double>
     
     var bindingFunction: Binding<CustomFunction> {

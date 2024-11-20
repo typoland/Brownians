@@ -99,6 +99,7 @@ public final actor Dot: Sendable {
                              dotSize: dotSize( `where`, size),
                              chaos: chaos)
             dotsAround.append(newDot)
+            newDots.append(newDot)
             await generator.addDot(newDot)
         } 
 
@@ -108,7 +109,7 @@ public final actor Dot: Sendable {
              somethingAdded = false
              search: for dot in dotsAround {
 
-                 if case .points(let up, _) = await randomInZoneCircle() * dot.randomInZoneCircle() {
+                 if case .points(let up, let down) = await randomInZoneCircle() * dot.randomInZoneCircle() {
                         let otherDots = dotsAround//.filter({$0.at != dot.at}) 
                      
                      
@@ -124,18 +125,31 @@ public final actor Dot: Sendable {
                         let inFrame = (0...size.width).contains(up.x) && (0...size.height).contains(up.y)
                      let inZoneOfOtherDots = await thisDotTouches(otherDots)
                         if zoneIsEmpty(with: dot, for: up, on: .up, of: dotsAround) && !inZoneOfOtherDots && inFrame {
-                            let newDot = Dot(at: up, 
+                            let newDotUp = Dot(at: up, 
                                              density: density(up, size), 
                                              dotSize: dotSize(up, size),
                                              chaos: chaos)
-                            await generator.addDot(newDot)
-                            dotsAround.append(newDot)
-                            newDots.append(newDot)
-                            neighbors.append(newDot.at)
-                            await newDot.addNeibour(at: at)
+                            await generator.addDot(newDotUp)
+                            dotsAround.append(newDotUp)
+                            newDots.append(newDotUp)
+                            neighbors.append(newDotUp.at)
+                            await newDotUp.addNeibour(at: at)
                             somethingAdded = true
                             break search
                         }
+                     if zoneIsEmpty(with: dot, for: down, on: .down, of: dotsAround) && !inZoneOfOtherDots && inFrame {
+                         let newDotDown = Dot(at: up, 
+                                            density: density(up, size), 
+                                            dotSize: dotSize(up, size),
+                                            chaos: chaos)
+                         await generator.addDot(newDotDown)
+                         dotsAround.append(newDotDown)
+                         newDots.append(newDotDown)
+                         neighbors.append(newDotDown.at)
+                         await newDotDown.addNeibour(at: at)
+                         somethingAdded = true
+                         break search
+                     }
                         
                 }
             }
@@ -209,7 +223,7 @@ public final actor Dot: Sendable {
     }
     
     public var description: String  {
-        "Dot at \(at.x._0001), \(at.y._0001)"
+        "Dot zone: \(zone) at \(at.x._0001), \(at.y._0001)"
     }
 }
 

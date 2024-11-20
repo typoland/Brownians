@@ -7,26 +7,27 @@
 
 import SwiftUI
 
-struct EnterTextFiledView<T>: View
-where T : FloatingPoint {
+struct EnterTextFiledView: View
+{
     var titleKey: LocalizedStringKey
-    @Binding var value: T
-    var range:ClosedRange<T>
-    @State private var local: T
+    @Binding var value: Double
+    var range: ClosedRange<Double>
+    
+    @State private var local: Double
     @FocusState private var focused: Bool
-    var formatter: NumberFormatter {
+    
+    
+    func formatter(_ range: ClosedRange<Double>) -> NumberFormatter {
         let nf = NumberFormatter()
         nf.maximumFractionDigits = 3
+        nf.minimum = (range.lowerBound) as NSNumber
+        nf.maximum = (range.upperBound) as NSNumber
         return nf
     }
-    func checkRangeAndAssign() {
-        if !range.contains(local) {
-            local = value
-        } else {
-            value = local
-        }
-    }
-    init(_ titleKey: LocalizedStringKey, value: Binding<T>, in range:ClosedRange<T>
+    
+    init(_ titleKey: LocalizedStringKey, 
+         value: Binding<Double>, 
+         in range:ClosedRange<Double>
     ) {
         self.titleKey = titleKey
         self._value = value
@@ -35,20 +36,22 @@ where T : FloatingPoint {
     }
     
     var body: some View {
-        TextField(titleKey, value: $local, formatter: formatter)
+        TextField(titleKey, 
+                  value: $local, 
+                  formatter: formatter(range))
             .onAppear {
                 local = value
             }.focused ($focused, equals: true)
             .onChange(of: focused) {
-                if !focused {checkRangeAndAssign()}
+                if !focused {value = local}
             }
-            .onChange(of: value) {
-                checkRangeAndAssign()
-                debugPrint ("CHANGED VALUE \(titleKey)")
-                local = value
+            .onSubmit {
+                value = local
+                debugPrint("EnterTextFiled submit -> \(value)")
             }
     }
 }
+
 
 #Preview {
     @Previewable @State var test = 0.2

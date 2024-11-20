@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct SizesView: View {
+    
     @Binding var dotSize: DotSize
+    
     var range: ClosedRange<Double>
     var body: some View {
         VStack {
@@ -26,4 +28,8 @@ struct SizesView: View {
             }
         }
     }
+}
+#Preview {
+    @Previewable @State var dotSize = DotSize(minSize: 2, maxSize: 20)
+    SizesView(dotSize: $dotSize, range: 0...100)
 }

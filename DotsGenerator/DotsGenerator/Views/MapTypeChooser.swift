@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MapTypeChooser: View {
+    
     @Binding var mapType: MapType
     @State var selectionIndex: Int = 0
     
@@ -15,15 +16,23 @@ struct MapTypeChooser: View {
         Binding(get: {mapType.index}, 
                 set: {mapType = $0 == 0 
             ? Defaults.defaultMapImage 
-            : Defaults.defaultMapFunction})
+            : Defaults.defaultMapFunction}
+        )
     }
     
     var body: some View {
-        Picker ("Map Type", selection: selectionBinding)
+        Picker ("Map Type", selection: $selectionIndex)
         {
             Text ("Image").tag(0)
             Text ("Function").tag(1)
             
+        }.onAppear {
+            selectionIndex = mapType.index
+        }.onChange(of: selectionIndex) {
+            mapType = selectionIndex == 0 
+            ? Defaults.defaultMapImage 
+            : Defaults.defaultMapFunction
+            debugPrint("set \(mapType)")
         }
     }
 }

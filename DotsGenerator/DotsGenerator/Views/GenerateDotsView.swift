@@ -31,8 +31,10 @@ struct GenerateDotsView: View {
     func start(in size: CGSize, manager: Manager) async {
         generatorTask = await generator
             .makeDotsTask(in: size, 
-                          detailMap: manager.detailSizeClosure(in:size) , 
-                          dotSizeMap: manager.dotSizeClosure(in: size),
+                          detailMap:
+                            manager.detailSizeClosure(in:size) , 
+                          dotSizeMap: 
+                            manager.dotSizeClosure(in: size),
                           chaos: manager.chaos,
                           startAt: startPoint)
         dots =  await generatorTask.value

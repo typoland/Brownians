@@ -56,7 +56,7 @@ struct MapFunctionView: View {
                             debugPrint("Test formula changed: \(testFormula)")
                             debugPrint("set to \(formula)")
                             debugPrint("what inside function? \(function.formula)")
-                            updateImage(size: testImageSize)
+                            updateImage(size: proxy.size/2)
                             
                         case .failure(let unresolved):
                             testImage = CIImage()

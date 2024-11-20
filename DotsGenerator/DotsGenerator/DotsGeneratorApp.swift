@@ -9,9 +9,10 @@ import SwiftUI
 
 @main
 struct DotsGeneratorApp: App {
+    @StateObject var manager = Manager()
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(manager: manager)
         }
     }
 }

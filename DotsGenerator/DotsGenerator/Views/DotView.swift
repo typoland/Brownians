@@ -36,6 +36,9 @@ struct DotView: View {
                                          width: circleSize, 
                                          height: circleSize))
                     context.fill(path, with: .color(.black))
+                    /*
+                    context.fill(path, with: .color(dotIndex > 1 ? Color.tryIndex(dotIndex) : dotIndex == 0 ? .red : .green))
+                     */
                 }
             }
         }

@@ -60,7 +60,8 @@ actor DotGenerator: Sendable {
             let p = aroundMiddle(jobSize)
             let dot = Dot(at: p, 
                           density: detailMap(p, jobSize), 
-                          dotSize: dotSizeMap(p, jobSize))
+                          dotSize: dotSizeMap(p, jobSize),
+                          chaos: chaos)
             
             dots.append(dot)
             //make first dots around

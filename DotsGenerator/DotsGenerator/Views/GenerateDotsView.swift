@@ -54,7 +54,7 @@ struct GenerateDotsView: View {
                 DotView(dots: dots, size: proxy.size, savePDF: $savePDF)
                     
                     .frame(width: proxy.size.width, height: proxy.size.height)
-                    .background(refresh ? Color.red : Color.white)
+                    .background(refresh ? Color.gray : Color.white)
                     .onAppear {
                         startPoint = CGPoint(x: proxy.size.width/2, 
                                              y: proxy.size.height/2)

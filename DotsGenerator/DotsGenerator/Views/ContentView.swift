@@ -9,12 +9,13 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @StateObject var manager = Manager()
+    @ObservedObject var manager = Manager()
     
     @State var refreshDrawing: Bool = false
     @State var savePDF: Bool = false
     @State var choosePath: Bool = false
    
+    @State var somethingChanged: Bool = false
     @ViewBuilder
     var finalView : some View {
         let size = manager.finalSize
@@ -36,7 +37,8 @@ struct ContentView: View {
     var body: some View {
         HStack (spacing: 20) {
             
-            ManagerSetupView(manager: manager)
+            ManagerSetupView(manager: manager, 
+                             didChange: $somethingChanged)
                 .frame(width: 350)            
             VStack {
                 
@@ -64,9 +66,17 @@ struct ContentView: View {
                         } else {
                             savePDF = true
                         }
-                    }, label: {Text("\(noPath ? "choose save folder ": "save PDF")")})
+                    }, label: {Text("\(noPath ? "choose save folder ": "save PDF")")}
+                    ).fileImporter(isPresented: $choosePath, 
+                                   allowedContentTypes: [.folder]) { result in
+                        if case .success(let url) = result {
+                            manager.resultsFolderPath = url
+                        }
+                        print ("try to laoad")}
                     
                 }.environmentObject(manager)
+                
+                
                 
                 ScrollView([.horizontal, .vertical]) {
                     let size = manager.finalSize

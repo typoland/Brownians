@@ -12,38 +12,61 @@ struct MapTypeView: View {
     @Binding var map: MapType
     @Binding var dotSize: DotSize
     var range: ClosedRange<Double>
+    
+    var bindingFunction: Binding<CustomFunction> {
+        Binding(get: {
+            if case .function(let function) = map {
+                return function
+            }
+            fatalError()
+        }, set: {
+            map = .function(function: $0)
+        })
+    }
+    
+    var bindingImageFilters: Binding<FiltersChain> {
+        Binding(get: {
+            if case .image(_, let filtersChain) = map {
+                return filtersChain
+            }
+            fatalError()
+        }, set: {
+            if case .image(let source, _) = map {
+                map = .image(image: source, filters: $0)
+            }
+        })
+    }
+    
+    var bindingImageSource: Binding<ImageSource> {
+        Binding(get: {
+            if case .image(let source, _) = map {
+                return source
+            }
+            fatalError()
+        }, set: {
+            if case .image( _, let filtersChain) = map {
+                map = .image(image: $0, filters: filtersChain)
+            }
+        })
+    }
+    
     var body: some View {
         VStack {
             Text(title)
-            SizesView(dotSize: $dotSize, range: range)
             
-//            let nameBinding = Binding(
-//                get: {map.name}, 
-//                set: {map = MapType($0)})
+            SizesView(dotSize: $dotSize, range: range)
+
             MapTypeChooser(mapType: $map)
             
             switch map {
-            case .function(let function):
-                
-                let binding = Binding(get: {function}, 
-                                      set: {map =  .function(function: $0)})
-                MapFunctionView(function: binding)
-                
-            case .image(let image, 
-                        let filtersChain):
+            case .function:
 
-                let bindingChain = Binding(
-                    get: {filtersChain}, 
-                    set: {map = .image(image: image, 
-                                       filters: $0)})
-                let bindingImage = Binding(
-                    get: {image}, 
-                    set: {map = .image(image: $0, 
-                                       filters: filtersChain)
-                        debugPrint("new map: \(map)")
-                    })
-                MapImageView(imageSource: bindingImage, 
-                             filters: bindingChain)
+                MapFunctionView(function: bindingFunction)
+                
+            case .image:
+
+                MapImageView(imageSource: bindingImageSource, 
+                             filters: bindingImageFilters)
                 
             }
         }
@@ -55,7 +78,7 @@ struct MapTypeView: View {
         .image(image: Defaults.imageSource, 
                filters: Defaults.filtersChain)
     @Previewable @State var size = DotSize(minSize: 10, maxSize: 20)
-    MapTypeView(title: "test",map: $i, dotSize: $size, range: 0...1000)
+    MapTypeView(title: "test",map: $i, dotSize: $size, range: 0...1000).environmentObject(Manager())
 }
 
 

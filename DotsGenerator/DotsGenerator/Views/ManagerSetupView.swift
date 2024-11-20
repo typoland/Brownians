@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ManagerSetupView: View {
     @ObservedObject var manager: Manager
+    @Binding var didChange: Bool
     @State var refreshPreview: Bool = true
     @State var openSetup: Bool = false
     @State var saveSetup: Bool = false
@@ -35,7 +36,10 @@ struct ManagerSetupView: View {
                     Button(action: {refreshPreview = false}, 
                            label: {Text("Stop")})
                 } else {
-                    Text("Preview shows only true detail size, images are scaled down to fit").lineLimit(3).controlSize(.mini)
+                    HStack {
+                        Button(action: {refreshPreview = true}, label: {Text(">")})
+                        Text("Preview shows only true detail size, images are scaled down to fit").lineLimit(3).controlSize(.mini)
+                    }
                     
                 }
             }.frame(maxWidth: .infinity)
@@ -50,20 +54,25 @@ struct ManagerSetupView: View {
             HStack (alignment: .top, spacing: 12) {
                 MapTypeView(title: "Detail size",
                             map: $manager.detailMap, 
-                            dotSize: $manager.detailSize ,
+                            dotSize: $manager.detailSize, 
                             range: 2...Double.infinity)
                 .environmentObject(manager)
                 Divider()
                 MapTypeView(title: "Dot size",
                             map: $manager.sizeMap, 
-                            dotSize:$manager.dotSize ,
+                            dotSize:$manager.dotSize, 
                             range: 0...1)
                 .environmentObject(manager)
 
             }
             }
             .onSubmit {
-                refreshPreview = true
+                refreshPreview = false
+                Task {
+                    try?  await Task.sleep(nanoseconds: 1_000_000)
+                    refreshPreview = true
+                    didChange.toggle()
+                }
             }
             Spacer()
             HStack {
@@ -75,8 +84,7 @@ struct ManagerSetupView: View {
                     print ("touched load")
                     openSetup = true
                 })
-            }
-            .fileImporter(isPresented: $openSetup, 
+            }.fileImporter(isPresented: $openSetup, 
                            allowedContentTypes: [.json]) { result in
                 print ("try to laoad")
                 switch result {
@@ -85,9 +93,9 @@ struct ManagerSetupView: View {
                         let decoder = JSONDecoder()
                         let data = try Data(contentsOf: url)
                         let newManager = try decoder.decode(Manager.self, from: data)
-                        print ("-----old Manager------")
-                        print (manager)
-                        print ("-----------")
+                        debugPrint ("-----old Manager------")
+                        debugPrint (manager)
+                        debugPrint ("-----------")
                         
                         if case .image(_, let importedFilters) = newManager.detailMap,
                            case .image(let existingImage, _) = manager.detailMap
@@ -100,11 +108,11 @@ struct ManagerSetupView: View {
                         {
                             newManager.sizeMap = .image(image: existingImage, filters: importedFilters)
                         }
-                        print ("update manager")
+                        debugPrint ("update manager")
                         manager.update(from: newManager)
                         
-                        print ("****** manager *******")
-                        print (manager)
+                        debugPrint ("****** manager *******")
+                        debugPrint (manager)
                         print ("*************")
                         refreshPreview = true
                         Task {
@@ -136,7 +144,11 @@ struct ManagerSetupView: View {
                     }
                 }
             }
+#if DEBUG
             Text ("\(timeElapsed ? info : manager.description)").animation(.easeInOut)
+            #else
+            Text ("\(timeElapsed ? info : "")").animation(.easeInOut)
+#endif
             
         }
         
@@ -144,5 +156,6 @@ struct ManagerSetupView: View {
 }
 
 #Preview {
-    ManagerSetupView(manager: Manager())
+    ManagerSetupView(manager: Manager(),
+                     didChange: .constant(false))
 }

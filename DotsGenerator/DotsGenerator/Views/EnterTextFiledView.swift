@@ -36,9 +36,6 @@ where T : FloatingPoint {
     
     var body: some View {
         TextField(titleKey, value: $local, formatter: formatter)
-            .onSubmit {
-                checkRangeAndAssign()
-            }
             .onAppear {
                 local = value
             }.focused ($focused, equals: true)
@@ -46,7 +43,8 @@ where T : FloatingPoint {
                 if !focused {checkRangeAndAssign()}
             }
             .onChange(of: value) {
-                print ("CHANGED VALUE")
+                checkRangeAndAssign()
+                debugPrint ("CHANGED VALUE \(titleKey)")
                 local = value
             }
     }

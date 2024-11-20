@@ -38,7 +38,7 @@ struct DotView: View {
                     context.fill(path, with: .color(.black))
                 }
             }
-        }.background(content: {Color.white})
+        }
     }
     
     public var body: some View {

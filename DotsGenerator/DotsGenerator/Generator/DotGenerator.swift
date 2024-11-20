@@ -88,9 +88,9 @@ actor DotGenerator: Sendable {
                     newDots = virginDots
                     generationNr += 1
 #if DEBUG
-                    let duration = Date.now.timeIntervalSince(start)
-                    let s = duration.formatted(.number.precision(.fractionLength(16)))
-                    print ("\(s)\t\(newDots.count)") 
+//                    let duration = Date.now.timeIntervalSince(start)
+//                    let s = duration.formatted(.number.precision(.fractionLength(16)))
+//                    print ("\(s)\t\(newDots.count)") 
 #endif
                     await sendTemporaryResult()
                 }

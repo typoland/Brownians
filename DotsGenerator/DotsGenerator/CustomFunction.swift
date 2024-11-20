@@ -20,6 +20,7 @@ struct CustomFunction: Codable, Hashable {
     }
     
     var name: String = "new" 
+    @MainActor
     var formula: String = "0.5"
     func parser(point: CGPoint, size:CGSize) ->  MathParser {
         let variables = ["x": Double(point.x),
@@ -70,6 +71,7 @@ struct CustomFunction: Codable, Hashable {
                 return .failure(.returnsNan(point, size))
             }
         }
+        debugPrint("Unresolved \(uresolved) , formula: \(formula)")
         return .success(formula)
     }
     

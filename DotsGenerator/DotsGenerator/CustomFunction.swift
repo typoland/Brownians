@@ -75,7 +75,7 @@ struct CustomFunction: Codable, Hashable {
         return .success(formula)
     }
     
-    func image(size: CGSize, simulate: CGSize) async -> CIImage {
+    func image(size: CGSize, simulate: CGSize) -> CIImage {
         //fit width, keep proportions
         let width = Int(size.width)
         let prop = simulate.width / size.width  

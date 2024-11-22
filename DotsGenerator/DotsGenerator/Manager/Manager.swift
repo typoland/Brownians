@@ -7,6 +7,7 @@
 import Foundation
 import CoreImage
 import Combine
+import SwiftUI
 
 @MainActor
 class Manager: ObservableObject, @preconcurrency Codable {
@@ -26,6 +27,10 @@ class Manager: ObservableObject, @preconcurrency Codable {
     @Published var dots: [Dot] = []
     @Published var chaos: Double = 0.7
     @Published var resultsFolderPath: URL? = nil
+    
+    @Published var rotationMap: MapType = Defaults.defaultMapRotation
+    @Published var rotationSizes = DotSize(minSize: 0, maxSize: Double.tau)
+    @Published var dotShape: any Shape = CircleShape() 
     
     required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -73,6 +78,9 @@ class Manager: ObservableObject, @preconcurrency Codable {
             
         case .function(let function):
             valueCount = {point, size in function.inSize(size)(point)}
+            
+        case .gradient(let type, let data):
+            valueCount = {point, size in 0.0} //TODO: not exist
         }
         
         return {point, size in

@@ -14,25 +14,19 @@ struct MapTypeChooser: View {
     
     var selectionBinding: Binding<Int> {
         Binding(get: {mapType.index}, 
-                set: {mapType = $0 == 0 
-            ? Defaults.defaultMapImage 
-            : Defaults.defaultMapFunction}
+                set: {mapType = MapType(index: $0)}
         )
     }
     
     var body: some View {
-        Picker ("Map Type", selection: $selectionIndex)
+        Picker ("Map Type", selection: selectionBinding)
         {
             Text ("Image").tag(0)
             Text ("Function").tag(1)
+            Text ("Gradient").tag(2)
             
         }.onAppear {
             selectionIndex = mapType.index
-        }.onChange(of: selectionIndex) {
-            mapType = selectionIndex == 0 
-            ? Defaults.defaultMapImage 
-            : Defaults.defaultMapFunction
-            debugPrint("set \(mapType)")
         }
     }
 }

@@ -14,6 +14,8 @@ extension MapType: CustomDebugStringConvertible {
             return "Image \(image), \(filters.chain.count) filters"
         case .function(let functions):
             return "Function \(functions)"
+        case .gradient(let type, let data):
+            return "Gradient \(type) \(data.stops.count) stops"
         }
     }
 }

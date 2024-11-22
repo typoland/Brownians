@@ -17,6 +17,7 @@ enum ImageSource: Codable {
     case url(url: URL)
     case local(name: String)
     case flatten(CIImage)
+
     
     enum Keys: CodingKey {
         case url

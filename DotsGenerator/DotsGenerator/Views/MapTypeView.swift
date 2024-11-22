@@ -14,42 +14,9 @@ struct MapTypeView: View {
     
     var range: ClosedRange<Double>
     
-    var bindingFunction: Binding<CustomFunction> {
-        Binding(get: {
-            if case .function(let function) = map {
-                return function
-            }
-            fatalError()
-        }, set: {
-            map = .function(function: $0)
-        })
-    }
     
-    var bindingImageFilters: Binding<FiltersChain> {
-        Binding(get: {
-            if case .image(_, let filtersChain) = map {
-                return filtersChain
-            }
-            fatalError()
-        }, set: {
-            if case .image(let source, _) = map {
-                map = .image(image: source, filters: $0)
-            }
-        })
-    }
+
     
-    var bindingImageSource: Binding<ImageSource> {
-        Binding(get: {
-            if case .image(let source, _) = map {
-                return source
-            }
-            fatalError()
-        }, set: {
-            if case .image( _, let filtersChain) = map {
-                map = .image(image: $0, filters: filtersChain)
-            }
-        })
-    }
     
     var body: some View {
         VStack {
@@ -60,15 +27,21 @@ struct MapTypeView: View {
             MapTypeChooser(mapType: $map)
             
             switch map {
-            case .function:
-
-                MapFunctionView(function: bindingFunction)
+            case .function( let function):
+                let binding = Binding(get: {function}, 
+                                      set: {map = .function(function: $0)})
+                MapFunctionView(function: binding)
                 
-            case .image:
-
-                MapImageView(imageSource: bindingImageSource, 
-                             filters: bindingImageFilters)
-                
+            case .image(image: let image, filters: let filtersChain):
+                let imageBinding = Binding(get: {image}, 
+                                           set: {map = .image(image: $0, filters: filtersChain)})
+                let filtersBinding = Binding(get: {filtersChain}, 
+                                           set: {map = .image(image: image, filters: $0)})
+                MapImageView(imageSource: imageBinding, 
+                             filters: filtersBinding)
+            case .gradient:
+               
+                MapGradientView(mapType: $map)
             }
         }
     }

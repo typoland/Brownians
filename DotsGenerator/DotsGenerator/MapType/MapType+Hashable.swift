@@ -14,6 +14,9 @@ extension MapType: Hashable {
             return filters1 == filters2 && s1.image == s2.image
         case (.function(let f1), .function(let f2)) : 
             return f1.formula == f2.formula
+        case (.gradient(let t1, let d1), .gradient(let t2, let d2)) :
+            return t1 == t2 && d1 == d2
+       
         default: return false
         }
     }
@@ -24,6 +27,8 @@ extension MapType: Hashable {
             return 0
         case .function:
             return 1
+        case .gradient:
+            return 2
         }
     }
     
@@ -43,6 +48,9 @@ extension MapType: Hashable {
             hasher.combine(image.image.hashValue)
         case .function(let functions):
             hasher.combine(functions.hashValue)
+        case .gradient(let type, let data):
+            hasher.combine(type)
+            hasher.combine(data)
         }
     }
     

@@ -10,20 +10,20 @@ import SwiftUI
 struct ManagerSetupView: View {
     
     @EnvironmentObject var manager: Manager
-
+    
     @State var refreshPreview: Bool = true
     @State var openSetup: Bool = false
     @State var saveSetup: Bool = false
     
     @State var info: String = ""
     @State var timeElapsed: Bool = false
-     
+    
     func setInfo(_ txt: String) async {
         print (txt)
         info = txt
         try? await Task.sleep(nanoseconds: 7_500_000_000)
     }
-    
+    @State var layer: Layer = .detail
     
     var body: some View {
         VStack {
@@ -49,26 +49,40 @@ struct ManagerSetupView: View {
             .frame(height: 30)
             
             VStack {
-            HStack {
-                Text("Chaos:")
-                EnterTextFiledView("0,5...0,99", 
-                                   value: $manager.chaos,
-                                   in: 0.4...1)
-            }
-            HStack (alignment: .top, spacing: 12) {
-                MapTypeView(title: "Detail size",
-                            map: $manager.detailMap, 
-                            dotSize: $manager.detailSize, 
-                            range: 2...1000)
-                .environmentObject(manager)
-                Divider()
-                MapTypeView(title: "Dot size",
-                            map: $manager.sizeMap, 
-                            dotSize: $manager.dotSize, 
-                            range: 0...1)
-                .environmentObject(manager)
-
-            }
+                HStack {
+                    Text("Chaos:")
+                    EnterTextFiledView("0,5...0,99", 
+                                       value: $manager.chaos,
+                                       in: 0.4...1)
+                }
+                Picker("", selection: $layer) {
+                    ForEach(Layer.allCases, id: \.self.rawValue) { name in
+                        Text("\(name)").tag(name)
+                    }
+                }.pickerStyle(.segmented)
+                switch layer {
+                    //                    HStack (alignment: .top, spacing: 12) 
+                case .detail:    
+                    MapTypeView(title: "Detail size",
+                                    map: $manager.detailMap, 
+                                    dotSize: $manager.detailSize, 
+                                    range: 2...1000)
+                        .environmentObject(manager)
+                case .darkness:
+                        MapTypeView(title: "Dot size",
+                                    map: $manager.sizeMap, 
+                                    dotSize: $manager.dotSize, 
+                                    range: 0...1)
+                        .environmentObject(manager)
+                case .angle:
+                        MapTypeView(title: "rotation", 
+                                    map: $manager.rotationMap, 
+                                    dotSize: 
+                                        $manager.rotationSizes,
+                                    range: 0...(Double.tau))
+                }
+                
+                //                }
             }
             .onSubmit {
                 refreshPreview = false
@@ -149,7 +163,7 @@ struct ManagerSetupView: View {
             }
 #if DEBUG
             Text ("\(timeElapsed ? info : manager.description)").animation(.easeInOut)
-            #else
+#else
             Text ("\(timeElapsed ? info : "")").animation(.easeInOut)
 #endif
             

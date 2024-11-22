@@ -23,6 +23,9 @@ struct Defaults {
         //NSImage(named: "Love")!.ciImage!
     }
     
+    static var image: CIImage {
+        CIImage()
+    }
     
     static var defaultMapImage: MapType {
         MapType.image(image: Defaults.imageSource, filters: FiltersChain(chain: []))
@@ -30,6 +33,14 @@ struct Defaults {
 
     static var defaultMapFunction: MapType {
         MapType.function(function: CustomFunction())
+    }
+    
+    static var defaultMapRotation: MapType {
+        MapType.function(function: CustomFunction())
+    }
+    
+    static var defaultDradient: MapType {
+        MapType.gradient(type: .linear, data: GradientData())
     }
     
     static var defaultMapValue: MapType {

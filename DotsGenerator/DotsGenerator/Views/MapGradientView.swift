@@ -43,26 +43,16 @@ struct MapGradientView: View {
                     Text("eliptical")
                 case .linear:
                     
-                    let bindingStart = Binding(
-                        get: {(data as! LinearGradientData).start}, 
-                        set: {newStart in
-                            let end = (data as! LinearGradientData).end
-                            mapType = .gradient(type: type, 
-                                                stops: stops, 
-                                                data: LinearGradientData(start: newStart, end: end))})
-                    let bindingEnd = Binding(
-                        get: {(data as! LinearGradientData).end}, 
-                        set: {newEnd in
-                            let start = (data as! LinearGradientData).start
-                            mapType = .gradient(type: type, 
-                                                stops: stops, 
-                                                data: LinearGradientData(start: start, end: newEnd))})
+                    let dataBinding = Binding(
+                        get: {data as! LinearGradientData}, 
+                        set: {
+                            debugPrint("new data: \($0)")
+                            mapType = .gradient(type: type, stops: stops, data: $0 as (any GradientData))})
                     let stopsBinding = Binding(
                         get: {stops}, 
                         set: {mapType = .gradient(type: type, stops: $0, data: data)})
                     
-                    LinearGradientDataView(start: bindingStart, 
-                                           end: bindingEnd, 
+                    LinearGradientDataView(linearGradientData: dataBinding, 
                                            stops: stopsBinding)
                 }
                 

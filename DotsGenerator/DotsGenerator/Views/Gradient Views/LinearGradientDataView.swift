@@ -9,8 +9,7 @@ import SwiftUI
 
 struct LinearGradientDataView: View {
     
-    @Binding var start: UnitPoint
-    @Binding var end: UnitPoint
+    @Binding var linearGradientData : LinearGradientData
     @Binding var stops: [GradientStop]
     @EnvironmentObject var manager: Manager
     @State var isDragging : Bool = false 
@@ -32,11 +31,11 @@ struct LinearGradientDataView: View {
                 debugPrint("LOC:\(what.location)")
                 debugPrint("UNIT:\(toUnit(size, point: what.location))")
                 if !isDragging {
-                    start = toUnit(size, point: what.location)
-                    debugPrint("START: \(start)")
+                    linearGradientData.start = toUnit(size, point: what.location)
+                    debugPrint("START: \(linearGradientData.start)")
                 } else {
-                    end = toUnit(size, point: what.location)
-                    debugPrint("END:\(end)\n")
+                    linearGradientData.end = toUnit(size, point: what.location)
+                    debugPrint("END:\(linearGradientData.end)\n")
                 }
                 push.toggle()
                 isDragging = true
@@ -55,12 +54,12 @@ struct LinearGradientDataView: View {
                 ZStack {
                     RenderGradientView(size: conrrolViewSize, 
                                        stops: stops, 
-                                       data: LinearGradientData(start: start, end: end)
-                                       )
+                                       data: linearGradientData)
+                                      
                     .gesture(dragStart(on: proxy.size))
                     
                 }
-                Text("\(start) \(end) \(stops.count)")
+                Text("\(linearGradientData.start) \(linearGradientData.end) \(stops.count)")
                 StopsView (stops: $stops)
             }
         }
@@ -75,5 +74,7 @@ struct LinearGradientDataView: View {
         GradientStop(color: .white, location: 0.66),
         GradientStop(color: .black, location: 1),
     ]
-    LinearGradientDataView(start: $data.start, end: $data.end, stops: $stops).environmentObject(Manager())
+    LinearGradientDataView(
+        linearGradientData: $data, 
+        stops: $stops).environmentObject(Manager())
 }

@@ -15,7 +15,7 @@ extension MapType: Hashable {
         case (.function(let f1), .function(let f2)) : 
             return f1.formula == f2.formula
         case (.gradient(let t1, let s1, let d1), .gradient(let t2, let s2, let d2)) :
-            return t1 == t2 && s1 == s2
+            return t1 == t2 && s1 == s2 && d1.hashValue == d2.hashValue
        
         default: return false
         }

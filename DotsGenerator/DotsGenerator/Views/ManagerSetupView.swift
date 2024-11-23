@@ -78,7 +78,7 @@ struct ManagerSetupView: View {
                         MapTypeView(title: "rotation", 
                                     map: $manager.rotationMap, 
                                     dotSize: 
-                                        $manager.rotationSizes,
+                                        $manager.rotationLimits,
                                     range: 0...(Double.tau))
                 }
                 

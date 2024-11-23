@@ -19,27 +19,53 @@ struct MapGradientView: View {
         }
         return Defaults.image.nsImage
     }
+    
+    
+    
     var body: some View {
-        if case .gradient(let type, let data) = mapType {
-            
-            VStack {
-//                let typeBinding = Binding(get: {type}, 
-//                                          set: {mapType = .gradient(type: $0, data: data)})
-                let dataBinding = Binding(get: {data}, 
-                                          set: {mapType = .gradient(type: type, data: $0)})
+        VStack {
+            if case .gradient(let type, let stops, let data) = mapType {
+                //            let dataBinding = Binding(get: {data}, 
+                //                                      set: {mapType = .gradient(type: type, stops: stops, data: $0)})
+                
+                
                 Picker("gradient type", selection: $choosen) { 
                     ForEach(MapType.GradientType.allCases, id:\.stringValue) { type in
                         Text("\(type.stringValue.capitalized)").tag(type)
                     }
                 }
-                Text ("Choosen \(choosen)")
-                let size = CGSize(width: 100, height: 100)
-                Image(nsImage: gradient(size: size))
+                               
                 
-            }.onAppear {
-                if case .gradient(let type, _) = mapType {
-                    choosen = type
+                switch type {
+                case .angular:
+                    Text("angular")
+                case .eliptical:
+                    Text("eliptical")
+                case .linear:
+                    
+                    let bindingStart = Binding(
+                        get: {(data as! LinearGradientData).start}, 
+                        set: {newStart in
+                            let end = (data as! LinearGradientData).end
+                            mapType = .gradient(type: type, 
+                                                stops: stops, 
+                                                data: LinearGradientData(start: newStart, end: end))})
+                    let bindingEnd = Binding(
+                        get: {(data as! LinearGradientData).end}, 
+                        set: {newEnd in
+                            let start = (data as! LinearGradientData).start
+                            mapType = .gradient(type: type, 
+                                                stops: stops, 
+                                                data: LinearGradientData(start: start, end: newEnd))})
+                    let stopsBinding = Binding(
+                        get: {stops}, 
+                        set: {mapType = .gradient(type: type, stops: $0, data: data)})
+                    
+                    LinearGradientDataView(start: bindingStart, 
+                                           end: bindingEnd, 
+                                           stops: stopsBinding)
                 }
+                
             }
         }
     }

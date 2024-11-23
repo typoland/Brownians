@@ -29,7 +29,7 @@ class Manager: ObservableObject, @preconcurrency Codable {
     @Published var resultsFolderPath: URL? = nil
     
     @Published var rotationMap: MapType = Defaults.defaultMapRotation
-    @Published var rotationSizes = DotSize(minSize: 0, maxSize: Double.tau)
+    @Published var rotationLimits = DotSize(minSize: 0, maxSize: Double.tau)
     @Published var dotShape: any Shape = CircleShape() 
     
     required init(from decoder: any Decoder) throws {
@@ -41,6 +41,9 @@ class Manager: ObservableObject, @preconcurrency Codable {
         self.detailSize = try container.decode(DotSize.self, forKey: .detailSize)
         self.dotSize = try container.decode(DotSize.self, forKey: .dotSize)
         self.chaos = try container.decode(Double.self, forKey: .chaos)
+        
+        self.rotationMap = try container.decode(MapType.self, forKey: .rotationMap)
+        self.rotationLimits = try container.decode(DotSize.self, forKey: .rotationLimits)
     }
     
     func encode(to encoder: any Encoder) throws {
@@ -52,6 +55,9 @@ class Manager: ObservableObject, @preconcurrency Codable {
         try container.encode(detailSize, forKey: .detailSize)
         try container.encode(dotSize, forKey: .dotSize)
         try container.encode(chaos, forKey: .chaos)
+        
+        try container.encode(rotationLimits, forKey: .rotationLimits)
+        try container.encode(rotationMap, forKey: .rotationMap)
     }
     
     enum CodingKeys: CodingKey {
@@ -63,6 +69,10 @@ class Manager: ObservableObject, @preconcurrency Codable {
         case dotSize
         case dots
         case chaos
+        
+        case rotationMap
+        case rotationLimits
+            
     }
     
     init () {}
@@ -79,8 +89,9 @@ class Manager: ObservableObject, @preconcurrency Codable {
         case .function(let function):
             valueCount = {point, size in function.inSize(size)(point)}
             
-        case .gradient(let type, let data):
-            valueCount = {point, size in 0.0} //TODO: not exist
+        case .gradient(let type, let stops, let data):
+            let grayMap =  map.image(size: size).grayMap 
+            valueCount = {point, size in grayMap.value(at: point, for: dotSize.maxSize)}
         }
         
         return {point, size in

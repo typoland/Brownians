@@ -8,17 +8,7 @@ import CoreImage
 import AppKit
 import SwiftUI
 
-struct DotSize: Codable, CustomStringConvertible {
-    var minSize: Double
-    var maxSize: Double
-   
-    static func * (lhs: Self, rhs: Double) -> Double {
-        (lhs.maxSize-lhs.minSize) * rhs + lhs.minSize //lerp
-    }
-    var description: String {
-        "\(minSize)...\(maxSize)"
-    }
-}
+
 
 //enum MapTypeNames: String, CaseIterable, Codable {
 //    case image = "Image"
@@ -48,7 +38,8 @@ enum MapType: Codable {
     
     enum GradientCodingKeys: CodingKey {
         case type
-        case gradientData
+        case stops
+        case data
     }
     
     enum MapTypeErrors: Error {
@@ -85,16 +76,17 @@ enum MapType: Codable {
             try sub.encode(filtersChain, forKey: .filters) 
         case .function(let functions):
             try container.encode(functions, forKey:. function) 
-        case .gradient(type: let type, data: let data) :
+        case .gradient(type: let type, let stops, let data) :
             var sub = container.nestedContainer(keyedBy: GradientCodingKeys.self, forKey: .gradient)
             try sub.encode(type, forKey: .type)
-            try sub.encode(data, forKey: .gradientData) 
+            try sub.encode(stops, forKey: .stops) 
+            try sub.encode(data, forKey: .data)
         }
     }
     
     case image(image: ImageSource, filters: FiltersChain)
     case function(function: CustomFunction)
-    case gradient(type: GradientType, data: GradientData )
+    case gradient(type: GradientType, stops:[GradientStop], data:  any GradientData )
     
     init(index: Int) {
         switch index {
@@ -122,8 +114,7 @@ enum MapType: Codable {
             
             return .image(image: .flatten(flatten), 
                           filters: FiltersChain(chain:[]))
-        case .gradient(let type, let data) :
-            
+        case .gradient(let type, let stops, let data) :
             let renderedGradient  =  image(size: size)
             let source = ImageSource.flatten(renderedGradient)
             return .image(image: source, 
@@ -138,29 +129,22 @@ enum MapType: Codable {
             
         case .image(image: let image, filters: let filters):
             return image.image
+            
         case .function(function: let function):
             return  function.image(size: CGSize(width: 100, height: 100), 
-                                  simulate: size)
-        case .gradient(type: let type, data: let data):
-            let renderer = ImageRenderer(content: GradientView(size: size))
-            let image = renderer.nsImage?.ciImage ?? Defaults.image
-            return image
+                                   simulate: size)
+            
+        case .gradient(_, let stops, let data):
+       
+                let renderer = ImageRenderer(
+                    content: RenderGradientView(size: size,
+                                                stops: stops,
+                                                data: data
+                                               )
+                )
+                return renderer.nsImage?.ciImage ?? Defaults.image
+               
+
         }
-    }
-    
-}
-struct GradientView: View {
-    var size: CGSize
-    var body: some View {
-        let stops = [
-            Gradient.Stop(color: .blue, location: 0),
-            Gradient.Stop(color: .green, location: 0.1),
-            Gradient.Stop(color: .orange, location: 0.5),
-            Gradient.Stop(color: .pink, location: 1),
-        ]
-        
-        Rectangle()
-            .fill(.conicGradient(Gradient(stops: stops), center: .center))
-            .frame(width: size.width, height: size.height)
     }
 }

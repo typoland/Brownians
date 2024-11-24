@@ -32,7 +32,7 @@ struct EllipticalGradientDataView: View {
                     // takeAngleToCenter(for: event.location, in: size)
                 } else {
                     let new = ellepticalGradientData.center.distance(to: event.location.unitPoint(in: size))
-                    ellepticalGradientData.endRadiusFraction  =  ellepticalGradientData.startRadiusFraction 
+                    ellepticalGradientData.endRadiusFraction  =  new
                 }
                 isDragging = true
             })

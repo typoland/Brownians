@@ -16,7 +16,6 @@ struct RenderGradientView: View {
     var body: some View {      
         let gradient = data.gradient(from: stops)
         ZStack {
-            let _ = debugPrint("wlcome in render gradient view \(data)")
             switch data {
             case is LinearGradientData:
                 let linear = data as! LinearGradientData

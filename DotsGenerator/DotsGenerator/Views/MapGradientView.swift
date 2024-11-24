@@ -21,14 +21,13 @@ struct MapGradientView: View {
         VStack {
             
                 Picker("gradient type", selection: $type) { 
-                    let _ = debugPrint("Picker selection", type)
                     ForEach(MapType.GradientType.allCases, id:\.stringValue) { type in
                         Text("\(type.stringValue.capitalized)").tag(type)
-                        let _ = debugPrint("    tag:",type)
                     }
                 }                
                 
                 switch type {
+                    
                 case .angular:
                     let dataBinding = Binding(
                         get: {data as! AngularGradientData}, 
@@ -36,7 +35,6 @@ struct MapGradientView: View {
                     AngularGradientDataView(
                         angularGradientData: dataBinding, 
                         stops: $stops)
-                    
                     
                 case .eliptical:
                     let dataBinding = Binding(
@@ -50,15 +48,10 @@ struct MapGradientView: View {
                     let dataBinding = Binding(
                         get: {data as! LinearGradientData}, 
                         set: {data = $0 })
-//                    
-                    
                     LinearGradientDataView(
                         linearGradientData: dataBinding, 
                         stops: $stops)
                 }
-                
-        
-            //Text("choosen \(choosen)")
         }
     }
     

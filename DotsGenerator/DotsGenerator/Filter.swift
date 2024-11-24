@@ -23,6 +23,7 @@ enum Filter: CaseIterable, Identifiable, Equatable, Codable, Hashable {
     [
         .gaussianBlur(radius: 10.0),
         .invert,
+        .gamma(power: 2.0),
         .morfologyGradient(radius: 8),
         .colorMonochrome(color: NSColor.white, 
                          intensity: 2),
@@ -39,6 +40,7 @@ enum Filter: CaseIterable, Identifiable, Equatable, Codable, Hashable {
         case gaussianBlur
         case invert
         case enchancer
+        case gamma
     }
     
     init (name: String) throws {
@@ -89,7 +91,11 @@ enum Filter: CaseIterable, Identifiable, Equatable, Codable, Hashable {
                                                             forKey: .invert) {
             debugPrint("maybe Invert \(sub)")
             self = .invert
-            
+        } else if let sub = try? container.nestedContainer(keyedBy: GammaAdjust.self, 
+                                                           forKey: .gamma) {
+            let power = try sub.decode(Double.self, forKey: .power)
+            self = .gamma(power: power)
+        
         } else {
             debugPrint("ANY, Throw error")
             throw Errors.noCodingKey
@@ -120,6 +126,10 @@ enum Filter: CaseIterable, Identifiable, Equatable, Codable, Hashable {
     
     enum Enchancer: CodingKey {
         case amount
+    }
+    
+    enum GammaAdjust: CodingKey {
+        case power
     }
     
     func encode(to encoder: any Encoder) throws {
@@ -166,6 +176,10 @@ enum Filter: CaseIterable, Identifiable, Equatable, Codable, Hashable {
             var subContainer = container.nestedContainer(keyedBy: Enchancer.self,
                                                          forKey: .enchancer) 
             try subContainer.encode(amount, forKey: .amount)
+        case .gamma(let power):
+            var subContainer = container.nestedContainer(keyedBy: GammaAdjust.self,
+                                                         forKey: .gamma) 
+            try subContainer.encode(power, forKey: .power)
         }
     }
     
@@ -184,6 +198,8 @@ enum Filter: CaseIterable, Identifiable, Equatable, Codable, Hashable {
             return "Invert"
         case .enhancer:
             return "Enchance"
+        case .gamma:
+            return "Gamma"
         }
     }
     static var names: [String] {
@@ -198,6 +214,7 @@ enum Filter: CaseIterable, Identifiable, Equatable, Codable, Hashable {
     case gaussianBlur(radius: Double)
     case invert
     case enhancer(amount: Double)
+    case gamma(power: Double)
     
     func filter(image: CIImage) -> CIImage? {
         switch self {
@@ -213,6 +230,8 @@ enum Filter: CaseIterable, Identifiable, Equatable, Codable, Hashable {
             image.colorInvert()
         case .enhancer(let amount):
             image.documentEnchancer(amount: amount)
+        case .gamma(let power):
+            image.gammaAdjust(power: power)
         }
     }
 

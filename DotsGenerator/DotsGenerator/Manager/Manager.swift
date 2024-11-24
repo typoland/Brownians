@@ -30,7 +30,7 @@ class Manager: ObservableObject, @preconcurrency Codable {
     
     @Published var rotationMap: MapType = Defaults.defaultMapRotation
     @Published var rotationLimits = DotSize(minSize: 0, maxSize: Double.tau)
-    @Published var dotShape: any Shape = CircleShape() 
+    @Published var dotShape: any Shape = CircleShape(dot: Dot()) 
     
     required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -107,6 +107,11 @@ class Manager: ObservableObject, @preconcurrency Codable {
     func dotSizeClosure(in size: CGSize) 
     -> (CGPoint, CGSize) -> Double {
         mapValue(map: sizeMap, dotSize: dotSize, in: size)
+    }
+    
+    func rotationClosure(in size: CGSize)
+    -> (CGPoint, CGSize) -> Double {
+        mapValue(map: rotationMap, dotSize: rotationLimits, in: size)
     }
     
     func updateSizes() {

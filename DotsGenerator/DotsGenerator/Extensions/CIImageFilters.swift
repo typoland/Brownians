@@ -105,6 +105,15 @@ public extension CIImage {
                  ]
         )?.outputImage 
     }
+    
+    func gammaAdjust(power: Double) -> CIImage? {
+        return CIFilter(name:"CIGammaAdjust",
+                        parameters: [
+                            kCIInputImageKey: self,
+                            "inputPower": NSNumber(value: power),
+                        ]
+        )?.outputImage 
+    }
 }
 
 

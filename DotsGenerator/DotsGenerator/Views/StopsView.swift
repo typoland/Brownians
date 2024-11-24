@@ -44,7 +44,7 @@ struct StopsView: View {
     @ViewBuilder
     func StopBox(index: Int, in size: CGSize) -> some View {
         Circle()
-            .fill(stops[index].color == .white ? .white : .black)
+            .fill(stops[index].color.system)
             .position(x: toLocal(stops[index].location, 
                                  in: size.width), 
                       y: 18)
@@ -52,7 +52,7 @@ struct StopsView: View {
                    height: boxWidth)
             .gesture(dragBox(index, width: size.width))
             .onTapGesture(count: 2, perform: {
-                stops[index].color = stops[index].color == .white ? .black : .white
+                stops[index].color = stops[index].color == .awhite ? .ablack : .awhite
             })
             .onTapGesture {
                 selectedStop = index
@@ -87,7 +87,7 @@ struct StopsView: View {
                     .onTapGesture(count: 2, perform: {event in 
                         let location = event.x/proxy.size.width
                         if let index = stops.firstIndex(where: {$0.location > location}) {
-                            stops.insert(GradientStop(color: .white, location: location), at: index )
+                            stops.insert(GradientStop(color: .awhite, location: location), at: index )
                         }
                         debugPrint("OK \(location)")
                     })
@@ -104,11 +104,11 @@ struct StopsView: View {
 
 #Preview {
     @Previewable @State var stops = [
-        GradientStop(color: .white, location: 0),
-        GradientStop(color: .black, location: 0.45),
-        GradientStop(color: .white, location: 0.5),
-        GradientStop(color: .black, location: 0.8),
-        GradientStop(color: .white, location: 1),
+        GradientStop(color: .awhite, location: 0),
+        GradientStop(color: .ablack, location: 0.45),
+        GradientStop(color: .awhite, location: 0.5),
+        GradientStop(color: .ablack, location: 0.8),
+        GradientStop(color: .awhite, location: 1),
     ]
     StopsView(stops: $stops)
 }

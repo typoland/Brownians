@@ -8,8 +8,8 @@
 import SwiftUI
 
 protocol GradientData: Codable, Hashable {
-    associatedtype T: ShapeStyle
-    func style(with stops: [GradientStop]) -> T 
+    //associatedtype T: ShapeStyle
+    //func style(with stops: [GradientStop]) -> T 
 }
 
 extension GradientData {
@@ -22,11 +22,20 @@ extension GradientData {
 struct GradientStop: Codable, Equatable, Hashable {
     
     enum StopColor : Int, Codable {
-        case white = 1
-        case black = 0
+        case awhite = 1
+        case ablack = 0
+        var system: Color {
+            switch self {
+            case .awhite:
+                return Color(white: 1)
+            case .ablack:
+                return Color(white: 0)
+            }
+        }
     }
+    
     init(from gradient_stop: Gradient.Stop) {
-        self.color = gradient_stop.color == .white ? .white : .black
+        self.color = gradient_stop.color == .white ? .awhite : .ablack
         self.location = gradient_stop.location
     }
     init(color: StopColor, location: Double) {
@@ -34,9 +43,10 @@ struct GradientStop: Codable, Equatable, Hashable {
         self.location = location
     }
     var gradient_stop: Gradient.Stop {
-        Gradient.Stop(color: color == .white ? .white : .black, 
+        Gradient.Stop(color: color.system, 
                       location: location)
     }
+    
     var color: StopColor
     var location: Double
 }
@@ -45,13 +55,7 @@ struct AngularGradientData: GradientData {
     var center: UnitPoint = .center
     var startAngle: Double = 0
     var endAngle: Double = 180
-    func style(with stops: [GradientStop]) -> AngularGradient {
-        .angularGradient(gradient(from: stops), 
-                         center: center,
-                         startAngle: Angle(degrees: startAngle),
-                         endAngle: Angle(degrees: endAngle))
-        
-    }
+    
     init(){}
     
     enum Keys: CodingKey {
@@ -79,11 +83,6 @@ struct AngularGradientData: GradientData {
 }
 struct LinearGradientData: GradientData {
     
-    func style(with stops: [GradientStop]) -> LinearGradient {
-        return .linearGradient(gradient(from: stops), 
-                               startPoint: start, 
-                               endPoint: end)
-    }
     
     var start: UnitPoint = UnitPoint(x: 0, y: 0)
     var end: UnitPoint = UnitPoint(x:1, y:1)

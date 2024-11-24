@@ -35,6 +35,8 @@ struct GenerateDotsView: View {
                             manager.detailSizeClosure(in:size) , 
                           dotSizeMap: 
                             manager.dotSizeClosure(in: size),
+                          rotationMap: 
+                            manager.rotationClosure(in: size),
                           chaos: manager.chaos,
                           startAt: startPoint)
         dots =  await generatorTask.value

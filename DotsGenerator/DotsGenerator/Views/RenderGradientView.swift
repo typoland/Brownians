@@ -14,26 +14,44 @@ struct RenderGradientView: View {
 
 
     var body: some View {      
-        let style = data.style(with: stops)
+        let gradient = data.gradient(from: stops)
         ZStack {
-            
-            switch style {
-            case is LinearGradient:
+            let _ = debugPrint("wlcome in render gradient view \(data)")
+            switch data {
+            case is LinearGradientData:
+                let linear = data as! LinearGradientData
                 Rectangle()
-                    .fill(style as! LinearGradient)
-                
-            case is EllipticalGradient:
+                    .fill(.linearGradient(
+                        gradient.colorSpace(.device), 
+                        startPoint: linear.start, 
+                        endPoint: linear.end) )
+            case is ElipticalGradientData:
+                let eliptical = data as! ElipticalGradientData
                 Rectangle()
-                    .fill(style as! EllipticalGradient)
-            case is AngularGradient:
+                    .fill(.ellipticalGradient(
+                        gradient.colorSpace(.device),
+                        center: eliptical.center,
+                        startRadiusFraction: eliptical.startRadiusFraction,
+                        endRadiusFraction: eliptical.endRadiusFraction
+                    ))
+                       
+            case is AngularGradientData:
+                let angular = data as! AngularGradientData      
                 Rectangle()
-                    .fill(style as! AngularGradient)
+                    .fill(.angularGradient(
+                        gradient.colorSpace(.device), 
+                        center: angular.center, 
+                        startAngle: Angle(degrees: angular.startAngle), 
+                        endAngle: Angle(degrees: angular.endAngle)
+                    ))
             default:
                 Text("no gradient")
             }
             
           
            
-        }.frame(width: size.width, height: size.height)
+        }.grayscale(1)
+          
+        .frame(width: size.width, height: size.height)
     }
 }

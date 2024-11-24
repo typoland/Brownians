@@ -51,7 +51,10 @@ struct FilterView : View {
                 let bindingAmount = Binding(get: {amount}, 
                                             set: {filter = .enhancer(amount: $0)}) 
                 TextField("amount", value: bindingAmount, format: .number)
-                
+            case .gamma(power: let power):
+                let bindingPower = Binding(get: {power}, 
+                                            set: {filter = .gamma(power: $0)}) 
+                TextField("gamma", value: bindingPower, format: .number)
             
             }
         

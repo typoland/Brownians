@@ -43,11 +43,11 @@ struct Defaults {
         MapType.gradient(type: .linear, stops:Defaults.defaultStops, data: LinearGradientData())
     }
     static var defaultStops: [GradientStop] {
-        [GradientStop(color: .white, location: 0),
-         GradientStop(color: .black, location: 0.25),
-         GradientStop(color: .white, location: 0.50),
-//         GradientStop(color: .black, location: 0.75),
-         GradientStop(color: .black, location: 1),
+        [GradientStop(color: .awhite, location: 0),
+//         GradientStop(color: .black, location: 0.25),
+//         GradientStop(color: .white, location: 0.50),
+////         GradientStop(color: .black, location: 0.75),
+         GradientStop(color: .ablack, location: 1),
         ]
     }
     static var defaultMapValue: MapType {

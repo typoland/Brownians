@@ -79,7 +79,7 @@ struct ManagerSetupView: View {
                                     map: $manager.rotationMap, 
                                     dotSize: 
                                         $manager.rotationLimits,
-                                    range: 0...(Double.tau))
+                                    range: -Double.tau...Double.tau)
                 }
                 
                 //                }

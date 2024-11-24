@@ -7,6 +7,20 @@
 
 import SwiftUI
 
+extension UnitPoint {
+    func cgPoint(in size: CGSize) -> CGPoint {
+        CGPoint(x: x*size.width, 
+                y: y*size.height)
+    }
+}
+
+extension CGPoint {
+    func unitPoint(in size: CGSize) -> UnitPoint {
+        UnitPoint(x: x/size.width, 
+                  y: y/size.height)
+    }
+}
+
 struct LinearGradientDataView: View {
     
     @Binding var linearGradientData : LinearGradientData
@@ -15,27 +29,22 @@ struct LinearGradientDataView: View {
     @State var isDragging : Bool = false 
     @State var push: Bool = false
     
-    func toSize(_ size:CGSize, point: UnitPoint) -> CGPoint {
-        CGPoint(x: point.x*size.width, 
-                y: point.y*size.height)
-    }
-    func toUnit(_ size:CGSize, point: CGPoint) -> UnitPoint {
-        UnitPoint(x: point.x/size.width, 
-                  y: point.y/size.height)
-    }
-    
+//    func toSize(_ size:CGSize, point: UnitPoint) -> CGPoint {
+//        CGPoint(x: point.x*size.width, 
+//                y: point.y*size.height)
+//    }
+//    func toUnit(_ size:CGSize, point: CGPoint) -> UnitPoint {
+//        UnitPoint(x: point.x/size.width, 
+//                  y: point.y/size.height)
+//    }
+//    
     func dragStart(on size: CGSize) -> some Gesture {
         DragGesture(minimumDistance: 0, coordinateSpace: .local)
             .onChanged ({what in 
-                debugPrint("SIZE:\(size)")
-                debugPrint("LOC:\(what.location)")
-                debugPrint("UNIT:\(toUnit(size, point: what.location))")
                 if !isDragging {
-                    linearGradientData.start = toUnit(size, point: what.location)
-                    debugPrint("START: \(linearGradientData.start)")
+                    linearGradientData.start = what.location.unitPoint(in: size)
                 } else {
-                    linearGradientData.end = toUnit(size, point: what.location)
-                    debugPrint("END:\(linearGradientData.end)\n")
+                    linearGradientData.end = what.location.unitPoint(in: size)
                 }
                 push.toggle()
                 isDragging = true
@@ -52,14 +61,19 @@ struct LinearGradientDataView: View {
                 let prop = manager.finalSize.width/manager.finalSize.height
                 let conrrolViewSize = CGSize(width: proxy.size.width, height: proxy.size.height / prop)
                 ZStack {
+                    
                     RenderGradientView(size: conrrolViewSize, 
                                        stops: stops, 
                                        data: linearGradientData)
                                       
                     .gesture(dragStart(on: proxy.size))
-                    
+                    Circle().fill(.green)
+                        .frame(width: 2, height: 2)
+                        .position(linearGradientData.start.cgPoint(in: proxy.size))
+                    Circle().fill(.red)
+                        .frame(width: 2, height: 2)
+                        .position(linearGradientData.end.cgPoint(in: proxy.size))
                 }
-                Text("\(linearGradientData.start) \(linearGradientData.end) \(stops.count)")
                 StopsView (stops: $stops)
             }
         }
@@ -69,12 +83,13 @@ struct LinearGradientDataView: View {
 #Preview {
     @Previewable @State var data = LinearGradientData(start: UnitPoint(x: 0, y: 0), end: UnitPoint(x: 1, y: 0))
     @Previewable @State var stops: [GradientStop] = [
-        GradientStop(color: .white, location: 0),
-        GradientStop(color: .black, location: 0.33),
-        GradientStop(color: .white, location: 0.66),
-        GradientStop(color: .black, location: 1),
+        GradientStop(color: .awhite, location: 0),
+        GradientStop(color: .ablack, location: 0.33),
+        GradientStop(color: .awhite, location: 0.66),
+        GradientStop(color: .ablack, location: 1),
     ]
     LinearGradientDataView(
         linearGradientData: $data, 
-        stops: $stops).environmentObject(Manager())
+        stops: $stops)
+    .environmentObject(Manager())
 }

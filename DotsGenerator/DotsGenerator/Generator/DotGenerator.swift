@@ -35,6 +35,7 @@ actor DotGenerator: Sendable {
                       //result: inout [Dot],
                       detailMap: @escaping (CGPoint, CGSize) -> Double, 
                       dotSizeMap: @escaping (CGPoint, CGSize) -> Double,
+                      rotationMap: @escaping (CGPoint, CGSize) -> Double,
                       chaos: Double,
                       startAt: CGPoint) async 
     
@@ -61,6 +62,7 @@ actor DotGenerator: Sendable {
             let dot = Dot(at: p, 
                           density: detailMap(p, jobSize), 
                           dotSize: dotSizeMap(p, jobSize),
+                          rotation: rotationMap(p, jobSize),
                           chaos: chaos)
             
             dots.append(dot)
@@ -69,6 +71,7 @@ actor DotGenerator: Sendable {
                                                    generator: self, 
                                                    density: detailMap,
                                                    dotSize: dotSizeMap,
+                                                   dotRotation: rotationMap,
                                                    chaos: chaos)
             
             var virginDots: [Dot] = []
@@ -83,6 +86,7 @@ actor DotGenerator: Sendable {
                                                      generator: self,
                                                      density: detailMap,
                                                      dotSize: dotSizeMap,
+                                                     dotRotation: rotationMap,
                                                      chaos: chaos)
                         virginDots.append(contentsOf: z)
                     }

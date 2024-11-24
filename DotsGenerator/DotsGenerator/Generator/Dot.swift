@@ -17,6 +17,7 @@ public final actor Dot: Sendable {
     public let lowerBound : Double
     public let upperBound : Double
     public let dotSize : Double
+    public let rotation : Double
     
     public var neighbors: [CGPoint] = []
     private var isFull: Bool = false
@@ -30,15 +31,24 @@ public final actor Dot: Sendable {
     public func randomInZoneCircle() async -> GeometricCircle  {
         GeometricCircle(at: at, radius: Double.random(in: zone))
     } 
-    
+    public init() {
+        at = CGPoint(x: 0, y: 0)
+        lowerBound = 3
+        upperBound = 10
+        rotation = 0
+        dotSize = 1
+        
+    }
     public init(at: CGPoint, 
                 density: Double, 
                 dotSize: Double, 
+                rotation: Double,
                 chaos: Double = 0.7) {
         
         self.at = at
         self.lowerBound = chaos * density //0.7 is OK
         self.upperBound = density
+        self.rotation = rotation
         self.dotSize = dotSize
     }
     
@@ -58,9 +68,11 @@ public final actor Dot: Sendable {
         return distanceToSelf && distanceToDot  ? 
         side : .none
     }
+    
     func addNeibour(at: CGPoint) async {
         neighbors.append(at)
     }
+    
     func zoneIsEmpty(with dot: Dot, for point: CGPoint, on side: ZoneSide, of dotsAround: [Dot] )  -> Bool {
         var otherDots = dotsAround
         
@@ -82,6 +94,7 @@ public final actor Dot: Sendable {
                  generator: DotGenerator, 
                  density: (CGPoint, CGSize) -> Double,
                  dotSize: (CGPoint, CGSize) -> Double,
+                 dotRotation: (CGPoint, CGSize) -> Double,
                  chaos: Double
     ) async -> [Dot]  {
         //CHECK ZONES
@@ -97,6 +110,7 @@ public final actor Dot: Sendable {
             let newDot = Dot(at: `where`, 
                              density: density(`where` , size),
                              dotSize: dotSize( `where`, size),
+                             rotation: dotRotation( `where`, size),
                              chaos: chaos)
             dotsAround.append(newDot)
             newDots.append(newDot)
@@ -128,6 +142,7 @@ public final actor Dot: Sendable {
                             let newDotUp = Dot(at: up, 
                                              density: density(up, size), 
                                              dotSize: dotSize(up, size),
+                                               rotation: dotRotation(up, size),
                                              chaos: chaos)
                             await generator.addDot(newDotUp)
                             dotsAround.append(newDotUp)
@@ -141,6 +156,7 @@ public final actor Dot: Sendable {
                          let newDotDown = Dot(at: up, 
                                             density: density(up, size), 
                                             dotSize: dotSize(up, size),
+                                              rotation: dotRotation(up, size),
                                             chaos: chaos)
                          await generator.addDot(newDotDown)
                          dotsAround.append(newDotDown)

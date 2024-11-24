@@ -135,14 +135,14 @@ enum MapType: Codable {
                                    simulate: size)
             
         case .gradient(_, let stops, let data):
-       
                 let renderer = ImageRenderer(
                     content: RenderGradientView(size: size,
                                                 stops: stops,
                                                 data: data
                                                )
                 )
-                return renderer.nsImage?.ciImage ?? Defaults.image
+            renderer.colorMode = .linear
+            return renderer.nsImage?.ciImage ?? Defaults.image
                
 
         }

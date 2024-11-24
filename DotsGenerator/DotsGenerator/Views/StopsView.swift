@@ -95,9 +95,7 @@ struct StopsView: View {
                     
             }
             }.frame(width: 200)
-            if let selectedStop {
-                Text("\(selectedStop) \(stops[selectedStop].location)")
-            }
+            
     }
     }
 }

@@ -8,78 +8,57 @@
 import SwiftUI
 
 struct MapGradientView: View {
-    @Binding var mapType: MapType
-    @State var choosen: MapType.GradientType = .linear
+    @Binding var type: MapType.GradientType
+    @Binding var stops: [GradientStop]
+    @Binding var data: any GradientData
+    //@State var choosen: MapType.GradientType = .linear
     //@Binding var data: GradientData
     
-    
-
-    
-    
     var body: some View {
-        let gradientTypeBinding = Binding(
-            get: {
-                if case .gradient(let type, _, _) = mapType {
-                return type 
-            } else {fatalError("map type is not gradient \(mapType)")} }, 
-            set: {newType in
-                if case .gradient(_, let stops, _) = mapType {
-                    switch newType {
-                    case .linear:
-                        mapType = .gradient(type: .linear, stops: stops, data: LinearGradientData())
-                    case .angular:
-                        mapType = .gradient(type: .angular, stops: stops, data: AngularGradientData())
-                    case .eliptical:
-                        mapType = .gradient(type: .eliptical, stops: stops, data: ElipticalGradientData())
-                    }
-                }
-            })
+        
+        
+        
         VStack {
-            if case .gradient(let type, let stops, let data) = mapType {
-                
-                
-                
-                Picker("gradient type", selection: gradientTypeBinding) { 
+            
+                Picker("gradient type", selection: $type) { 
+                    let _ = debugPrint("Picker selection", type)
                     ForEach(MapType.GradientType.allCases, id:\.stringValue) { type in
                         Text("\(type.stringValue.capitalized)").tag(type)
+                        let _ = debugPrint("    tag:",type)
                     }
-                }
-                
-                let stopsBinding = Binding(
-                    get: {stops}, 
-                    set: {mapType = .gradient(type: type, stops: $0, data: data)}) 
+                }                
                 
                 switch type {
                 case .angular:
                     let dataBinding = Binding(
                         get: {data as! AngularGradientData}, 
-                        set: {mapType = .gradient(type: type, stops: stops, data: $0 )})
+                        set: {data = $0})
                     AngularGradientDataView(
                         angularGradientData: dataBinding, 
-                        stops: stopsBinding)
+                        stops: $stops)
                     
                     
                 case .eliptical:
                     let dataBinding = Binding(
                         get: {data as! ElipticalGradientData}, 
-                        set: {mapType = .gradient(type: type, stops: stops, data: $0 )})
+                        set: {data = $0})
                     EllipticalGradientDataView(
                         ellepticalGradientData: dataBinding, 
-                        stops: stopsBinding)
+                        stops: $stops)
                     
                 case .linear:
                     let dataBinding = Binding(
                         get: {data as! LinearGradientData}, 
-                        set: {mapType = .gradient(type: type, stops: stops, data: $0 )})
-                    
+                        set: {data = $0 })
+//                    
                     
                     LinearGradientDataView(
                         linearGradientData: dataBinding, 
-                        stops: stopsBinding)
+                        stops: $stops)
                 }
                 
-            }
-            Text("choosen \(choosen)")
+        
+            //Text("choosen \(choosen)")
         }
     }
     

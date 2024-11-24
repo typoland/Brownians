@@ -39,9 +39,43 @@ struct MapTypeView: View {
                                            set: {map = .image(image: image, filters: $0)})
                 MapImageView(imageSource: imageBinding, 
                              filters: filtersBinding)
-            case .gradient:
-               
-                MapGradientView(mapType: $map)
+                
+            case .gradient(let type, let stops, let data):
+                let stopsBinding = Binding(
+                    get: {stops}, 
+                    set: {map = .gradient(type: type, stops: $0, data: data)})
+                
+                let typeBinding = Binding (
+                    get: {type}, 
+                    set: {
+                        if $0 != type {
+                        switch $0 {
+                            
+                        case .angular:
+                            map = .gradient(type: .angular, 
+                                            stops: stops, 
+                                            data: AngularGradientData())
+                        case .eliptical:
+                            map = .gradient(type: .eliptical, 
+                                                    stops: stops, 
+                                            data: ElipticalGradientData())
+                        case .linear:
+                            map = .gradient(type: .linear, 
+                                            stops: stops, 
+                                            data: LinearGradientData())
+                        }
+                    }})
+                
+                let dataBinding = Binding (
+                    get: {data}, 
+                    set: {
+                        map = .gradient(type: type, stops: stops, data: $0)
+                    })
+                
+                MapGradientView(
+                    type: typeBinding, 
+                    stops: stopsBinding, 
+                    data: dataBinding)
             }
         }
     }

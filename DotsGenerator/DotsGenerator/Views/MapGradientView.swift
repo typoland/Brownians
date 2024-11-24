@@ -17,7 +17,7 @@ struct MapGradientView: View {
     
     
     var body: some View {
-        var gradientTypeBinding = Binding(
+        let gradientTypeBinding = Binding(
             get: {
                 if case .gradient(let type, _, _) = mapType {
                 return type 
@@ -51,7 +51,12 @@ struct MapGradientView: View {
                 
                 switch type {
                 case .angular:
-                    Text("angular")
+                    let dataBinding = Binding(
+                        get: {data as! AngularGradientData}, 
+                        set: {mapType = .gradient(type: type, stops: stops, data: $0 )})
+                    AngularGradientDataView(
+                        angularGradientData: dataBinding, 
+                        stops: stopsBinding)
                     
                     
                 case .eliptical:

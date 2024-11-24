@@ -21,8 +21,8 @@ struct EllipticalGradientDataView: View {
                                        stops: stops, 
                                        data: ellepticalGradientData)
                 } 
+                StopsView (stops: $stops)
             }
-            StopsView (stops: $stops)
         }
     }
 }

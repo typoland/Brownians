@@ -56,13 +56,13 @@ enum Filter: CaseIterable, Identifiable, Equatable, Codable, Hashable {
                     blue: array[2], 
                     alpha: array[3])
         }
-        debugPrint ("init some Filter")
+        //debugPrint ("init some Filter")
         let container = try decoder.container(keyedBy: FilterCodingKeys.self) 
-        debugPrint ("...container: \(container.allKeys)")
+        //debugPrint ("...container: \(container.allKeys)")
         
         if let sub = try? container.nestedContainer(keyedBy: Monochrome.self, 
                                                     forKey: .colorMonochrome) {
-            debugPrint("maybe Monochrome \(sub)")
+            //debugPrint("maybe Monochrome \(sub)")
             let colorArr = try sub.decode([Double].self, forKey: .color)
             let intesity = try sub.decode(Double.self, forKey: .intensity)
             self = .colorMonochrome(color: nsColor(colorArr), intensity: intesity)
@@ -70,26 +70,26 @@ enum Filter: CaseIterable, Identifiable, Equatable, Codable, Hashable {
             
         } else if let sub = try? container.nestedContainer(keyedBy: MorfologyGradient.self, 
                                                            forKey: .morfologyGradient) {
-            debugPrint("maybe Morfology \(sub)")
+            //debugPrint("maybe Morfology \(sub)")
             let radius = try sub.decode(Double.self, forKey: .radius)
             self = .morfologyGradient(radius: radius)
             
         } else  if let sub = try? container.nestedContainer(keyedBy: ColorClamp.self, 
                                                             forKey: .colorClamp) {
-            debugPrint("maybe ColorClamp \(sub)")
+            //debugPrint("maybe ColorClamp \(sub)")
             let min = try sub.decode([Double].self, forKey: .min)
             let max = try sub.decode([Double].self, forKey: .max)
             self = .colorClamp(min: nsColor(min), max: nsColor(max))
             
         } else  if let sub = try? container.nestedContainer(keyedBy: GaussianBlur.self, 
                                                             forKey: .gaussianBlur) {
-            debugPrint("maybe Gaussian Blur \(sub)")
+            //debugPrint("maybe Gaussian Blur \(sub)")
             let radius = try sub.decode(Double.self, forKey: .radius)
             self = .gaussianBlur(radius: radius)
             
         } else  if let sub = try? container.nestedContainer(keyedBy: Invert.self, 
                                                             forKey: .invert) {
-            debugPrint("maybe Invert \(sub)")
+            //debugPrint("maybe Invert \(sub)")
             self = .invert
         } else if let sub = try? container.nestedContainer(keyedBy: GammaAdjust.self, 
                                                            forKey: .gamma) {
@@ -97,10 +97,10 @@ enum Filter: CaseIterable, Identifiable, Equatable, Codable, Hashable {
             self = .gamma(power: power)
         
         } else {
-            debugPrint("ANY, Throw error")
+            //debugPrint("ANY, Throw error")
             throw Errors.noCodingKey
         }
-        debugPrint(self)
+        debugPrint("Decoded", self)
     }
 
     enum Monochrome: CodingKey {

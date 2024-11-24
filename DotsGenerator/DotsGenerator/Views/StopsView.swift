@@ -89,7 +89,6 @@ struct StopsView: View {
                         if let index = stops.firstIndex(where: {$0.location > location}) {
                             stops.insert(GradientStop(color: .awhite, location: location), at: index )
                         }
-                        debugPrint("OK \(location)")
                     })
                     
                     

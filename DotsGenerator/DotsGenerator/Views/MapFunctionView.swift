@@ -27,7 +27,6 @@ struct MapFunctionView: View {
             testImage = await function.image(
                 size: format_3_4(size), 
                 simulate: manager.finalSize)
-            debugPrint("test image updated for: \(function.formula)")
         }
     }
     
@@ -47,15 +46,15 @@ struct MapFunctionView: View {
                 TextField("formula", text: $testFormula, axis: .vertical).lineLimit(20, reservesSpace: false)
                     .onChange(of: testFormula) {
                         
-                        debugPrint("change of test formula: \(testFormula)")
+                        //debugPrint("change of test formula: \(testFormula)")
                         parserErrors = []
                         switch function.checkFormula(testFormula, on: manager.finalSize) {
                         case .success(let formula): 
-                            debugPrint("before Change: \(function.formula)")
+                            //debugPrint("before Change: \(function.formula)")
                             function.formula = formula // Nothing happens
-                            debugPrint("Test formula changed: \(testFormula)")
-                            debugPrint("set to \(formula)")
-                            debugPrint("what inside function? \(function.formula)")
+                            //debugPrint("Test formula changed: \(testFormula)")
+                            //debugPrint("set to \(formula)")
+                            //debugPrint("what inside function? \(function.formula)")
                             updateImage(size: proxy.size/2)
                             
                         case .failure(let unresolved):

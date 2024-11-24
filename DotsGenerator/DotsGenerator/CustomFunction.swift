@@ -71,7 +71,7 @@ struct CustomFunction: Codable, Hashable {
                 return .failure(.returnsNan(point, size))
             }
         }
-        debugPrint("Unresolved \(uresolved) , formula: \(formula)")
+        //debugPrint("Unresolved \(uresolved) , formula: \(formula)")
         return .success(formula)
     }
     

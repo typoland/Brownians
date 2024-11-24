@@ -136,15 +136,18 @@ struct ManagerSetupView: View {
                             await setInfo("OK")
                         }
                         
-                    } catch {
+                    } catch let error as NSError {
+                        debugPrint("ERROR \(error)")
                         Task {
                             await setInfo(error.localizedDescription)
                         }
                     }
                     
                 case .failure(let error as NSError):
+                    debugPrint("ERROR \(error)")
                     Task {
                         await setInfo(error.localizedDescription)
+                        
                     }
                 }
                 

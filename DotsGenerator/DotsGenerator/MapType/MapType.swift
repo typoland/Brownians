@@ -59,6 +59,21 @@ enum MapType: Codable {
         } else if let function = try? container.decode(CustomFunction.self, forKey: .function) {
             self = .function(function: function)
             
+        } else if let gradient = try? container.nestedContainer(keyedBy: GradientCodingKeys.self, forKey: .gradient) {
+            let type = try gradient.decode(GradientType.self, forKey: .type)
+            let stops = try gradient.decode([GradientStop].self, forKey: .stops)
+            let data: any GradientData
+            switch type {
+            case .angular: 
+                data = try gradient.decode(AngularGradientData.self, forKey: .data)
+            case .eliptical:
+                data = try gradient.decode(ElipticalGradientData.self, forKey: .data)
+            case .linear:
+                data = try gradient.decode(LinearGradientData.self, forKey: .data)
+            }
+                
+            self = .gradient(type: type, stops: stops, data: data)
+           
         } else {
             print (container.allKeys)
             throw MapTypeErrors.mapTypeKeyNotFound("\(container.allKeys)")

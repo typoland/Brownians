@@ -75,6 +75,19 @@ class Manager: ObservableObject, @preconcurrency Codable {
             
     }
     
+    func update(from manager: Manager) {
+        sizeOwner = manager.sizeOwner
+        finalSize = manager.finalSize
+        detailMap = manager.detailMap
+        sizeMap = manager.sizeMap
+        detailSize = manager.detailSize
+        dotSize = manager.dotSize
+        rotationMap = manager.rotationMap
+        rotationLimits = manager.rotationLimits
+        dots = []
+        chaos = manager.chaos
+    }
+    
     init () {}
      
     private func mapValue(map: MapType, dotSize: DotSize, in size: CGSize) -> (CGPoint, CGSize) -> Double {

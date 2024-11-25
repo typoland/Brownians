@@ -28,12 +28,12 @@ struct StopsView: View {
                     stops[0].location = v
                 } else if index == stops.count-1 , 
                             stops[stops.count-2].location < v,
-                v <= 1{
+                          v <= 1{
                     stops[index].location = v
                 } else  if index > 0, 
-                    stops[index-1].location < v,
-                   index < (stops.count-1), 
-                    stops[index+1].location > v {
+                            stops[index-1].location < v,
+                           index < (stops.count-1), 
+                            stops[index+1].location > v {
                     stops[index].location = v
                 }
                 
@@ -57,45 +57,60 @@ struct StopsView: View {
             .onTapGesture {
                 selectedStop = index
             }.contextMenu {
-                Button(action: {
-                    stops.remove(at: index)
-                }, label: { Label("Delete", systemImage: "icon") })
+                if stops.count>2 {
+                    Button(action: {
+                        selectedStop = nil
+                        stops.remove(at: index)
+                        
+                    }, label: { Label("Delete", systemImage: "icon") })
+                }
             }
     }
     
     var body: some View {
         VStack(alignment: .center) {
-            Group {
-            GeometryReader {proxy in
-          
-                
-                    ZStack {
-                        ForEach((0..<stops.count).indices, id:\.self) {index in
-                            StopBox(index: index, in: proxy.size)
-                                .onTapGesture {
-                                    selectedStop = nil
-                                }
-                        }
-                        
-                    }
-                    .frame(width: proxy.size.width, height: 12)
-                
-                    .background(.linearGradient(
-                        Gradient(stops: stops.map{$0.gradient_stop}), 
-                        startPoint: UnitPoint(x: 0, y: 0), 
-                        endPoint: UnitPoint(x: 1, y: 0)))
-                    .onTapGesture(count: 2, perform: {event in 
-                        let location = event.x/proxy.size.width
-                        if let index = stops.firstIndex(where: {$0.location > location}) {
-                            stops.insert(GradientStop(color: .awhite, location: location), at: index )
-                        }
-                    })
-                    
-                    
-            }
-            }.frame(width: 200)
             
-    }
+            GeometryReader {proxy in
+                
+                
+                ZStack {
+                    ForEach((0..<stops.count).indices, id:\.self) {index in
+                        StopBox(index: index, in: proxy.size)
+                            .onTapGesture {
+                                selectedStop = nil
+                            }
+                    }
+                    
+                }
+                .frame(width: proxy.size.width, height: 12)
+                
+                .background(.linearGradient(
+                    Gradient(stops: stops.map{$0.gradient_stop}), 
+                    startPoint: UnitPoint(x: 0, y: 0), 
+                    endPoint: UnitPoint(x: 1, y: 0)))
+                .onTapGesture(count: 2, perform: {event in 
+                    let location = event.x/proxy.size.width
+                    if let index = stops.firstIndex(where: {$0.location > location}) {
+                        let prevStop = stops[safe: index-1]
+                        let prevLoc = prevStop?.location ?? 0.0
+                        let prevColor = prevStop?.color ?? 0.5
+                        let nextColor = stops[index].color
+                        let nextLoc = stops[index].location
+                        let prop = (nextLoc - location) /  (nextLoc - prevLoc) 
+                        let new = (nextColor - prevColor) * prop + prevColor
+                        
+                        stops.insert(GradientStop(color: new, location: location), at: index )
+                    }
+                })
+                
+                
+            }.frame(height: 20)
+            if let selectedStop {
+                Slider(value: $stops[selectedStop].color, in: 0...1)
+                    .accentColor(.gray)
+                    .controlSize(.mini)
+            }
+        }.frame(width: 200)
     }
 }
 

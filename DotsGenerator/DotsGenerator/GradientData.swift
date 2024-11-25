@@ -19,25 +19,23 @@ extension GradientData {
     }
 }
 
+typealias StopColor = Double 
+extension StopColor {
+    static var awhite = 1.0 //Color.init(white: 1)
+    static var ablack = 0.0 //Color.init(white: 0)
+    
+    var system: Color {
+        Color.init(white: self)
+    }
+}
+
 struct GradientStop: Codable, Equatable, Hashable {
     
-    enum StopColor : Int, Codable {
-        case awhite = 1
-        case ablack = 0
-        var system: Color {
-            switch self {
-            case .awhite:
-                return Color(white: 1)
-            case .ablack:
-                return Color(white: 0)
-            }
-        }
-    }
-    
     init(from gradient_stop: Gradient.Stop) {
-        self.color = gradient_stop.color == .white ? .awhite : .ablack
+        self.color = NSColor(gradient_stop.color).blackComponent
         self.location = gradient_stop.location
     }
+    
     init(color: StopColor, location: Double) {
         self.color = color
         self.location = location

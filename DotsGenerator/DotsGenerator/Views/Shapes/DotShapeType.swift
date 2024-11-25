@@ -55,15 +55,7 @@ enum DotShapeType: Codable, Hashable {
             path.closeSubpath()
         }
     } 
-    
-//    var size: CGSize {
-//        switch self {
-//        case .oval(let size): return size
-//        case .rectangle(let size): return size
-//        case .triangle(let size): return size
-//        }
-//    }
-    
+        
     var index: Int {
         switch self {
         case .oval: return 0

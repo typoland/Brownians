@@ -118,7 +118,3 @@ public extension CIImage {
 
 
 
-
-
-
-

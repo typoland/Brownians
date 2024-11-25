@@ -98,8 +98,18 @@ class Manager: ObservableObject, @preconcurrency Codable {
     private func mapValue(map: MapType, dotSize: DotSize, in size: CGSize) -> (CGPoint, CGSize) -> Double {
         let valueCount : (CGPoint, CGSize) ->Double
         let map = map.faltten(to: size)
+        let size = CGSize(width: dotSize.maxSize, height: dotSize.maxSize)
+       
+        
         switch map {
             
+            /*
+             case .image(image: let source, _):
+             let grayMap = source.image//.grayMap          
+             valueCount =  {point, _ in grayMap
+             .averageGray(at: point, in: size)}
+             
+             */
         case .image(image: let source, _):
             let grayMap = source.image.grayMap          
             valueCount =  {point, _ in grayMap.value(at: point, for: dotSize.maxSize)}

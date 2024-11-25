@@ -46,6 +46,7 @@ struct ManagerSetupView: View {
                     Picker("dot Type", selection: $dotShapeTypeIndex) {
                         Text ("Oval").tag(0)
                         Text("Rectangle").tag(1)
+                        Text("Triangle").tag(2)
                     }.onChange(of: dotShapeTypeIndex) {
                         if let new = try? DotShapeType(index: dotShapeTypeIndex) {
                             manager.dotShape = new
@@ -54,10 +55,13 @@ struct ManagerSetupView: View {
                     switch manager.dotShape {
                     case .oval(let size):
                         let binding = Binding(get: {size}, set: {manager.dotShape = .oval(size: $0)})
-                        CGSizeView(size: binding, range: 0...2)
+                        CGSizeView(size: binding, range: 0...4)
                     case .rectangle(let size):
                         let binding = Binding(get: {size}, set: {manager.dotShape = .rectangle(size: $0)})
-                        CGSizeView(size: binding, range: 0...2)
+                        CGSizeView(size: binding, range: 0...4)
+                    case .triangle(let size):
+                        let binding = Binding(get: {size}, set: {manager.dotShape = .triangle(size: $0)})
+                        CGSizeView(size: binding, range: 0...4)
                     }
                     
                 }.padding(12)
@@ -89,7 +93,7 @@ struct ManagerSetupView: View {
                     Text("Chaos:")
                     EnterTextFiledView("0,5...0,99", 
                                        value: $manager.chaos,
-                                       in: 0.4...1)
+                                       in: 0.3...1)
                 }
                 Picker("", selection: $layer) {
                     ForEach(Layer.allCases, id: \.self.rawValue) { name in
@@ -116,7 +120,7 @@ struct ManagerSetupView: View {
                                     map: $manager.rotationMap, 
                                     dotSize: 
                                         $manager.rotationLimits,
-                                    range: -Double.tau...Double.tau)
+                                    range: -360...360)
                 }
                 
                 //                }

@@ -38,11 +38,25 @@ struct DotView: View {
                                          height: circleSize))
                     
                     context.fill(path, with: .color(.black))
-                    /*
-                    context.fill(path, with: .color(dotIndex > 1 ? Color.tryIndex(dotIndex) : dotIndex == 0 ? .red : .green))
-                     */
+                    
+                    //*
+//                    context.fill(path, with: .color(dotIndex > 1 ? Color.tryIndex(dotIndex) : dotIndex == 0 ? .red : .green))
+                     //*/
                 }
             }
+            /*
+            for dotIndex in dots.indices {
+                var path = Path()
+                let rect = NSRect(origin: dots[dotIndex].at, size: CGSize(width: 5, height: 5))
+                path.addEllipse(in: rect.onCenter)
+                context.fill(path, with: .color(Color.tryIndex(dotIndex)))
+                
+                path = Path()
+                let r2 = NSRect(origin: dots[dotIndex].at, size: CGSize(width: 12, height: 12))
+                path.addEllipse(in: r2.onCenter)
+                context.stroke(path, with: .color(.gray), lineWidth: 1)
+            }
+             */
         }
     }
     

@@ -21,14 +21,11 @@ struct DotShape: Shape {
     }
     
     func path(in rect: CGRect) -> Path {
-        let shift = NSRect(x: rect.origin.x-rect.width/2,
-                           y: rect.origin.y-rect.height/2, 
-                           width: rect.width*type.size.width,
-                           height:rect.height*type.size.height)
+        
         return Path { path in 
-            type.addShape(path: &path, in: shift)
+            type.addShape(path: &path, in: rect)
             let u = path.transform(rotationTransform)
-            path = u.path(in: shift)
+            path = u.path(in: rect)
         }
     }
 }

@@ -26,12 +26,16 @@ struct AngularGradientDataView: View {
     @EnvironmentObject var manager: Manager
     @State var isDragging = false
     
+    let cursorSize = 8.0
+    
     func dragCenter(for size: CGSize) -> some Gesture {
         DragGesture(minimumDistance: 0, coordinateSpace: .local)
             .onChanged({event in
-                angularGradientData.center = event.location
+                angularGradientData.center = (
+                    CGPoint(x:event.location.x - cursorSize/2,
+                            y:event.location.y - cursorSize/2))
                     .unitPoint(in: size)
-                    .shifted(in: size)
+                    .shifted(in: size) 
             })
     }
     
@@ -41,7 +45,6 @@ struct AngularGradientDataView: View {
                 if !isDragging {                    
                     angularGradientData.startAngle 
                     = angularGradientData.center.cgPoint(in: size).angleTo(event.location)
-                   // takeAngleToCenter(for: event.location, in: size)
                 } else {
                     let new = angularGradientData.center.cgPoint(in: size).angleTo(event.location)
                     angularGradientData.endAngle = new < angularGradientData.startAngle 
@@ -58,23 +61,25 @@ struct AngularGradientDataView: View {
         GeometryReader {proxy in
         VStack {
                 let prop = manager.finalSize.width/manager.finalSize.height
-                let conrrolViewSize = CGSize(width: proxy.size.width, 
+                let controlViewSize = CGSize(width: proxy.size.width, 
                                              height: proxy.size.width / prop)
                 ZStack {
-                    RenderGradientView(size: conrrolViewSize, 
+                    RenderGradientView(size: controlViewSize, 
                                        stops: stops, 
                                        data: angularGradientData)
 
-                    .gesture(setAngles(for: conrrolViewSize))
+                    .gesture(setAngles(for: controlViewSize))
                     .overlay {
                         Circle()
-                            .fill(Color.white.opacity(0.2))
+                            .fill(Color.white.opacity(0.1))
+                            .stroke(.gray)
                             .position(angularGradientData
-                                .center.cgPoint(in: conrrolViewSize)
-                                .shifted(in: conrrolViewSize) + CGPoint(x: 4, y: 4)
+                                .center.cgPoint(in: controlViewSize)
+                                .shifted(in: controlViewSize) + CGPoint(x: cursorSize/2, 
+                                                                        y: cursorSize/2)
                             )
-                            .gesture(dragCenter(for: conrrolViewSize))
-                            .frame(width: 8, height:8)
+                            .frame(width: cursorSize, height:cursorSize)
+                            .gesture(dragCenter(for: controlViewSize))
                     }
                         
                     

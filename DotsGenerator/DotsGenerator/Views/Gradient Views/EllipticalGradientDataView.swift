@@ -13,12 +13,15 @@ struct EllipticalGradientDataView: View {
     @State var isDragging = false
     @EnvironmentObject var manager: Manager
     
+    let cursorSize = 8.0
     
     func dragCenter(for size: CGSize) -> some Gesture {
         DragGesture(minimumDistance: 0, coordinateSpace: .local)
             .onChanged({event in
-                ellepticalGradientData.center = event.location
-                    .unitPoint(in: size)
+                ellepticalGradientData.center = (
+                    CGPoint(x:event.location.x - cursorSize/2,
+                            y:event.location.y - cursorSize/2))
+                .unitPoint(in: size)
                     .shifted(in: size)
             })
     }
@@ -54,14 +57,16 @@ struct EllipticalGradientDataView: View {
                     .gesture(setARadiuses(for: conrrolViewSize))
                     .overlay {
                         Circle()
-                            .fill(Color.white.opacity(0.2))
-                            .border(.gray)
+                            .fill(Color.white.opacity(0.1))
+                            .stroke(.gray)
                             .position(ellepticalGradientData
                                 .center.cgPoint(in: conrrolViewSize)
-                                .shifted(in: conrrolViewSize) + CGPoint(x: 4, y: 4)
+                                .shifted(in: conrrolViewSize) 
+                                      + CGPoint(x: cursorSize/2, 
+                                                y: cursorSize/2)
                             )
+                            .frame(width: cursorSize, height:cursorSize)
                             .gesture(dragCenter(for: conrrolViewSize))
-                            .frame(width: 8, height:8)
                     }
                 } 
                 

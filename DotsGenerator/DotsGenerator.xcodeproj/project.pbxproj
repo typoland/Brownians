@@ -403,7 +403,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"DotsGenerator/Preview Content\"";
 				DEVELOPMENT_TEAM = 3ASHMCMJEN;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -447,7 +447,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"DotsGenerator/Preview Content\"";
 				DEVELOPMENT_TEAM = 3ASHMCMJEN;
 				ENABLE_HARDENED_RUNTIME = YES;

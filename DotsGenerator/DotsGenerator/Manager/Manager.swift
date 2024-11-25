@@ -30,7 +30,7 @@ class Manager: ObservableObject, @preconcurrency Codable {
     
     @Published var rotationMap: MapType = Defaults.defaultMapRotation
     @Published var rotationLimits = DotSize(minSize: 0, maxSize: Double.tau)
-    @Published var dotShape: any Shape = CircleShape(dot: Dot()) 
+    @Published var dotShape: DotShapeType = .rectangle(size: CGSize(width: 2, height: 0.5))
     
     required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -44,6 +44,7 @@ class Manager: ObservableObject, @preconcurrency Codable {
         
         self.rotationMap = try container.decode(MapType.self, forKey: .rotationMap)
         self.rotationLimits = try container.decode(DotSize.self, forKey: .rotationLimits)
+        self.dotShape = try container.decode(DotShapeType.self, forKey: .dotShape)
     }
     
     func encode(to encoder: any Encoder) throws {
@@ -58,6 +59,7 @@ class Manager: ObservableObject, @preconcurrency Codable {
         
         try container.encode(rotationLimits, forKey: .rotationLimits)
         try container.encode(rotationMap, forKey: .rotationMap)
+        try container.encode(dotShape, forKey: .dotShape)
     }
     
     enum CodingKeys: CodingKey {
@@ -72,6 +74,8 @@ class Manager: ObservableObject, @preconcurrency Codable {
         
         case rotationMap
         case rotationLimits
+        
+        case dotShape
             
     }
     
@@ -84,6 +88,7 @@ class Manager: ObservableObject, @preconcurrency Codable {
         dotSize = manager.dotSize
         rotationMap = manager.rotationMap
         rotationLimits = manager.rotationLimits
+        dotShape = manager.dotShape
         dots = []
         chaos = manager.chaos
     }

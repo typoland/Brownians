@@ -17,13 +17,16 @@ struct ManagerSetupView: View {
     
     @State var info: String = ""
     @State var timeElapsed: Bool = false
+    @State var popover: Bool = false
+    
+    @State var dotShapeTypeIndex = 0
     
     func setInfo(_ txt: String) async {
         print (txt)
         info = txt
         try? await Task.sleep(nanoseconds: 7_500_000_000)
     }
-    @State var layer: Layer = .detail
+    @State var layer: Layer = .darkness
     
     var body: some View {
         VStack {
@@ -32,6 +35,39 @@ struct ManagerSetupView: View {
                              savePDF: .constant(false))
             .environmentObject(manager)
             .frame(height: 180)
+            .onTapGesture {
+                popover = true
+            }
+            .popover(isPresented: $popover, 
+                     attachmentAnchor: .point(UnitPoint(x: 0.5, y: 0.8)), 
+                     arrowEdge: .bottom) {
+                VStack {
+                    
+                    Picker("dot Type", selection: $dotShapeTypeIndex) {
+                        Text ("Oval").tag(0)
+                        Text("Rectangle").tag(1)
+                    }.onChange(of: dotShapeTypeIndex) {
+                        if let new = try? DotShapeType(index: dotShapeTypeIndex) {
+                            manager.dotShape = new
+                        }
+                    }
+                    switch manager.dotShape {
+                    case .oval(let size):
+                        let binding = Binding(get: {size}, set: {manager.dotShape = .oval(size: $0)})
+                        CGSizeView(size: binding, range: 0...2)
+                    case .rectangle(let size):
+                        let binding = Binding(get: {size}, set: {manager.dotShape = .rectangle(size: $0)})
+                        CGSizeView(size: binding, range: 0...2)
+                    }
+                    
+                }.padding(12)
+                    .frame(width: 300)
+                    .controlSize(.mini)
+                   
+                
+                
+            }.frame(width: 400, height: 200, alignment: .top)  
+                .onAppear {dotShapeTypeIndex = manager.dotShape.index}
             
             Group {
                 if refreshPreview {
@@ -61,19 +97,20 @@ struct ManagerSetupView: View {
                     }
                 }.pickerStyle(.segmented)
                 switch layer {
-                    //                    HStack (alignment: .top, spacing: 12) 
+                case .darkness:
+                    MapTypeView(title: "Dot size",
+                                map: $manager.sizeMap, 
+                                dotSize: $manager.dotSize, 
+                                range: 0...1)
+                    .environmentObject(manager)
+                    
                 case .detail:    
                     MapTypeView(title: "Detail size",
                                     map: $manager.detailMap, 
                                     dotSize: $manager.detailSize, 
                                     range: 2...1000)
                         .environmentObject(manager)
-                case .darkness:
-                        MapTypeView(title: "Dot size",
-                                    map: $manager.sizeMap, 
-                                    dotSize: $manager.dotSize, 
-                                    range: 0...1)
-                        .environmentObject(manager)
+                
                 case .angle:
                         MapTypeView(title: "rotation", 
                                     map: $manager.rotationMap, 

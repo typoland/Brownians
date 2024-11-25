@@ -30,12 +30,12 @@ struct DotView: View {
                 let dot = dots[dotIndex]
                 let circleSize = dot.upperBound * dot.dotSize
                 if circleSize > 0 {
-                    let path = CircleShape(dot: dot)
+                    let path =  DotShape(dot: dot, type: manager.dotShape)
+                    
                         .path(in: CGRect(x: dot.at.x, 
                                          y: dot.at.y, 
                                          width: circleSize, 
                                          height: circleSize))
-                    //context.rotate(by: Angle(degrees: dot.rotation))
                     
                     context.fill(path, with: .color(.black))
                     /*

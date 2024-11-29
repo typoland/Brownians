@@ -47,6 +47,7 @@ struct ManagerSetupView: View {
                         Text ("Oval").tag(0)
                         Text("Rectangle").tag(1)
                         Text("Triangle").tag(2)
+                        Text("Diamond").tag(3)
                     }.onChange(of: dotShapeTypeIndex) {
                         if let new = try? DotShapeType(index: dotShapeTypeIndex) {
                             manager.dotShape = new
@@ -61,6 +62,9 @@ struct ManagerSetupView: View {
                         CGSizeView(size: binding, range: 0...4)
                     case .triangle(let size):
                         let binding = Binding(get: {size}, set: {manager.dotShape = .triangle(size: $0)})
+                        CGSizeView(size: binding, range: 0...4)
+                    case .diamond(let size):
+                        let binding = Binding(get: {size}, set: {manager.dotShape = .diamond(size: $0)})
                         CGSizeView(size: binding, range: 0...4)
                     }
                     

@@ -37,6 +37,7 @@ enum DotShapeType: Codable, Hashable {
     case oval(size: CGSize)
     case rectangle(size: CGSize)
     case triangle(size: CGSize)
+    case diamond(size: CGSize)
     
     func addShape(path: inout Path, in rect: CGRect) {
         
@@ -53,7 +54,20 @@ enum DotShapeType: Codable, Hashable {
             path.addLine(to: CGPoint(x: rect.origin.x, 
                                      y: rect.origin.y + rect.size.height))
             path.closeSubpath()
+        case .diamond(size: let size):
+            let rect = rect.onCenter * size
+            path .move(to: CGPoint(x: rect.origin.x, 
+                                   y: rect.origin.y + rect.size.height/2))
+            path.addLine(to: CGPoint(x: rect.origin.x + rect.width/2, 
+                                     y: rect.origin.y + rect.size.height))
+            path.addLine(to: CGPoint(x: rect.origin.x + rect.width, 
+                                     y: rect.origin.y + rect.size.height/2))
+            path.addLine(to: CGPoint(x: rect.origin.x + rect.width/2, 
+                                     y: rect.origin.y))
+            path.closeSubpath()
+            
         }
+    
     } 
         
     var index: Int {
@@ -61,6 +75,7 @@ enum DotShapeType: Codable, Hashable {
         case .oval: return 0
         case .rectangle: return 1
         case .triangle: return 2
+        case .diamond: return 3
         }
     }
     init(index: Int) throws {
@@ -68,6 +83,7 @@ enum DotShapeType: Codable, Hashable {
         case 0: self = .oval(size: CGSize(width: 1, height: 1))
         case 1:  self = .rectangle(size: CGSize(width: 1, height: 1))
         case 2:  self = .triangle(size: CGSize(width: 1, height: 1))
+        case 3:  self = .diamond(size: CGSize(width: 1, height: 1))
         default: throw Errors.noIndex(index)   
         }
     }

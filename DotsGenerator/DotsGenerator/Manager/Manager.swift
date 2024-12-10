@@ -16,17 +16,19 @@ class Manager: ObservableObject, @preconcurrency Codable {
         case manager
         case detailMap
         case sizeMap
+        case rotationMap
     }
     
     @Published var sizeOwner: SizeOwner = .manager
     @Published var finalSize: CGSize = CGSize(width: 800, height: 600)
+    @Published var finalScale: Double = 1.0
     @Published var detailMap: MapType = Defaults.defaultMapImage
     @Published var sizeMap: MapType = Defaults.defaultMapImage
     @Published var detailSize = DotSize(minSize: 4, maxSize: 6)
     @Published var dotSize = DotSize(minSize: 0.2, maxSize: 0.7)
     @Published var dots: [Dot] = []
     @Published var chaos: Double = 0.7
-    @Published var resultsFolderPath: URL? = nil
+    ///@Published var resultsFolderPath: URL? = nil
     
     @Published var rotationMap: MapType = Defaults.defaultMapRotation
     @Published var rotationLimits = DotSize(minSize: 0, maxSize: Double.tau)
@@ -36,6 +38,7 @@ class Manager: ObservableObject, @preconcurrency Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.sizeOwner = try container.decode(SizeOwner.self, forKey: .sizeOwner)
         self.finalSize = try container.decode(CGSize.self, forKey: .finalSize)
+        self.finalScale = try container.decode(CGFloat.self, forKey: .finalScale)
         self.detailMap = try container.decode(MapType.self, forKey: .detailMap)
         self.sizeMap = try container.decode(MapType.self, forKey: .sizeMap)
         self.detailSize = try container.decode(DotSize.self, forKey: .detailSize)
@@ -51,6 +54,7 @@ class Manager: ObservableObject, @preconcurrency Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(sizeOwner, forKey: .sizeOwner)
         try container.encode(finalSize, forKey: .finalSize)
+        try container.encode(finalScale, forKey: .finalScale)
         try container.encode(detailMap, forKey: .detailMap)
         try container.encode(sizeMap, forKey: .sizeMap)
         try container.encode(detailSize, forKey: .detailSize)
@@ -65,6 +69,7 @@ class Manager: ObservableObject, @preconcurrency Codable {
     enum CodingKeys: CodingKey {
         case sizeOwner
         case finalSize
+        case finalScale
         case detailMap
         case sizeMap
         case detailSize
@@ -82,6 +87,7 @@ class Manager: ObservableObject, @preconcurrency Codable {
     func update(from manager: Manager) {
         sizeOwner = manager.sizeOwner
         finalSize = manager.finalSize
+        finalScale = manager.finalScale
         detailMap = manager.detailMap
         sizeMap = manager.sizeMap
         detailSize = manager.detailSize
@@ -117,7 +123,7 @@ class Manager: ObservableObject, @preconcurrency Codable {
         case .function(let function):
             valueCount = {point, size in function.inSize(size)(point)}
             
-        case .gradient(let type, let stops, let data):
+        case .gradient:
             let grayMap =  map.image(size: size).grayMap 
             valueCount = {point, size in grayMap.value(at: point, for: dotSize.maxSize)}
         }
@@ -146,6 +152,7 @@ class Manager: ObservableObject, @preconcurrency Codable {
         switch sizeOwner {
         case .manager:
             _ = self.finalSize
+            finalScale = 1
         case .detailMap:
             if case .image(let source, _) = detailMap {
                 self.finalSize = source.image.extent.size
@@ -157,6 +164,12 @@ class Manager: ObservableObject, @preconcurrency Codable {
                 self.finalSize = source.image.extent.size
             } else {
                 //newSize = self.size
+                sizeOwner = .manager
+            }
+        case .rotationMap:
+            if case .image(let source, _) = rotationMap {
+                self.finalSize = source.image.extent.size
+            } else {
                 sizeOwner = .manager
             }
         }

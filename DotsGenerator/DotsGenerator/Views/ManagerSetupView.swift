@@ -28,6 +28,40 @@ struct ManagerSetupView: View {
     }
     @State var layer: Layer = .darkness
     
+    @ViewBuilder
+    var popoverContent: some View {
+        VStack {
+            Picker("dot Type", selection: $dotShapeTypeIndex) {
+                Text ("Oval").tag(0)
+                Text("Rectangle").tag(1)
+                Text("Triangle").tag(2)
+                Text("Diamond").tag(3)
+            }.onChange(of: dotShapeTypeIndex) {
+                if let new = try? DotShapeType(index: dotShapeTypeIndex) {
+                    manager.dotShape = new
+                }
+            }
+            switch manager.dotShape {
+            case .oval(let size):
+                let binding = Binding(get: {size}, set: {manager.dotShape = .oval(size: $0)})
+                CGSizeView(size: binding, range: 0...4)
+            case .rectangle(let size):
+                let binding = Binding(get: {size}, set: {manager.dotShape = .rectangle(size: $0)})
+                CGSizeView(size: binding, range: 0...4)
+            case .triangle(let size):
+                let binding = Binding(get: {size}, set: {manager.dotShape = .triangle(size: $0)})
+                CGSizeView(size: binding, range: 0...4)
+            case .diamond(let size):
+                let binding = Binding(get: {size}, set: {manager.dotShape = .diamond(size: $0)})
+                CGSizeView(size: binding, range: 0...4)
+            }
+            
+        }.padding(12)
+            .frame(width: 300)
+            .controlSize(.mini)
+    }
+    
+    
     var body: some View {
         VStack {
             
@@ -35,62 +69,37 @@ struct ManagerSetupView: View {
                              savePDF: .constant(false))
             .environmentObject(manager)
             .frame(height: 180)
-            .onTapGesture {
-                popover = true
-            }
-            .popover(isPresented: $popover, 
-                     attachmentAnchor: .point(UnitPoint(x: 0.5, y: 0.8)), 
-                     arrowEdge: .bottom) {
-                VStack {
-                    
-                    Picker("dot Type", selection: $dotShapeTypeIndex) {
-                        Text ("Oval").tag(0)
-                        Text("Rectangle").tag(1)
-                        Text("Triangle").tag(2)
-                        Text("Diamond").tag(3)
-                    }.onChange(of: dotShapeTypeIndex) {
-                        if let new = try? DotShapeType(index: dotShapeTypeIndex) {
-                            manager.dotShape = new
-                        }
-                    }
-                    switch manager.dotShape {
-                    case .oval(let size):
-                        let binding = Binding(get: {size}, set: {manager.dotShape = .oval(size: $0)})
-                        CGSizeView(size: binding, range: 0...4)
-                    case .rectangle(let size):
-                        let binding = Binding(get: {size}, set: {manager.dotShape = .rectangle(size: $0)})
-                        CGSizeView(size: binding, range: 0...4)
-                    case .triangle(let size):
-                        let binding = Binding(get: {size}, set: {manager.dotShape = .triangle(size: $0)})
-                        CGSizeView(size: binding, range: 0...4)
-                    case .diamond(let size):
-                        let binding = Binding(get: {size}, set: {manager.dotShape = .diamond(size: $0)})
-                        CGSizeView(size: binding, range: 0...4)
-                    }
-                    
-                }.padding(12)
-                    .frame(width: 300)
-                    .controlSize(.mini)
-                   
-                
-                
-            }.frame(width: 400, height: 200, alignment: .top)  
-                .onAppear {dotShapeTypeIndex = manager.dotShape.index}
             
-            Group {
+            HStack {
                 if refreshPreview {
                     Button(action: {refreshPreview = false}, 
-                           label: {Text("Stop")})
+                           label: {Image(systemName: "eye.slash.circle.fill")})
                 } else {
-                    HStack {
-                        Button(action: {refreshPreview = true}, label: {Text(">")})
-                        Text("Preview shows only true detail size, images are scaled down to fit").lineLimit(3).controlSize(.mini)
-                    }
+                    
+                    Button(action: {refreshPreview = true}, label: {Image(systemName: "eye.circle.fill")})
+                }  
+                Text("Preview shows only true detail size, \nimages are scaled down to fit").lineLimit(3).controlSize(.mini)
+                
+                Spacer()
+                
+                Button(action: {popover = true}, 
+                       label: {Image(systemName: "gearshape.fill")})
+                
+                
+                
+            }.buttonStyle(.borderless)
+                .frame(width: 280, height: 30)
+                .onAppear {dotShapeTypeIndex = manager.dotShape.index}
+            
+            //.frame(maxWidth: .infinity)
+            
+                .popover(isPresented: $popover, 
+                         attachmentAnchor: .point(UnitPoint(x: 0.96, y: 0.85)), 
+                         arrowEdge: .bottom) {
+                    popoverContent
+                    
                     
                 }
-            }
-            //.frame(maxWidth: .infinity)
-            .frame(height: 30)
             
             VStack {
                 HStack {
@@ -108,27 +117,28 @@ struct ManagerSetupView: View {
                 case .darkness:
                     MapTypeView(title: "Dot size",
                                 map: $manager.sizeMap, 
-                                dotSize: $manager.dotSize, 
+                                dotSize: $manager.dotSize, sizeOwner: .sizeMap, 
                                 range: 0...1)
                     .environmentObject(manager)
                     
                 case .detail:    
                     MapTypeView(title: "Detail size",
-                                    map: $manager.detailMap, 
-                                    dotSize: $manager.detailSize, 
-                                    range: 2...1000)
-                        .environmentObject(manager)
-                
+                                map: $manager.detailMap, 
+                                dotSize: $manager.detailSize, sizeOwner: .detailMap, 
+                                range: 2...1000)
+                    .environmentObject(manager)
+                    
                 case .angle:
-                        MapTypeView(title: "rotation", 
-                                    map: $manager.rotationMap, 
-                                    dotSize: 
-                                        $manager.rotationLimits,
-                                    range: -360...360)
+                    MapTypeView(title: "rotation", 
+                                map: $manager.rotationMap, 
+                                dotSize: 
+                                    $manager.rotationLimits, sizeOwner: .rotationMap,
+                                range: -360...360)
                 }
                 
                 //                }
             }
+            
             .onSubmit {
                 refreshPreview = false
                 Task {
@@ -146,8 +156,9 @@ struct ManagerSetupView: View {
                     print ("touched load")
                     openSetup = true
                 })
-            }.fileImporter(isPresented: $openSetup, 
-                           allowedContentTypes: [.json]) { result in
+            }
+            .fileImporter(isPresented: $openSetup, 
+                          allowedContentTypes: [.json]) { result in
                 print ("try to laoad")
                 switch result {
                 case .success(let url):
@@ -175,7 +186,7 @@ struct ManagerSetupView: View {
                         
                         debugPrint ("****** manager *******")
                         debugPrint (manager)
-                        print ("*************")
+                        debugPrint ("*************")
                         refreshPreview = true
                         Task {
                             await setInfo("OK")

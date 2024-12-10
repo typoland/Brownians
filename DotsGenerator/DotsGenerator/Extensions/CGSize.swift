@@ -9,4 +9,8 @@ extension CGSize {
     static func / (lhs: Self, rhs: Double) -> CGSize{
         return CGSize(width: lhs.width/rhs, height: lhs.height/rhs)
     }
+    
+    static func * (lhs: Self, rhs: Double) -> CGSize{
+        return CGSize(width: lhs.width*rhs, height: lhs.height*rhs)
+    }
 }

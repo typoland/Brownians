@@ -87,7 +87,7 @@ enum Filter: CaseIterable, Identifiable, Equatable, Codable, Hashable {
             let radius = try sub.decode(Double.self, forKey: .radius)
             self = .gaussianBlur(radius: radius)
             
-        } else  if let sub = try? container.nestedContainer(keyedBy: Invert.self, 
+        } else  if let _ = try? container.nestedContainer(keyedBy: Invert.self, 
                                                             forKey: .invert) {
             //debugPrint("maybe Invert \(sub)")
             self = .invert

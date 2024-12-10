@@ -22,8 +22,11 @@ struct DotView: View {
     @EnvironmentObject var manager: Manager
     var dots: [Dot]
     var size: CGSize 
+    var saveFolderURL: URL? = nil
+    
     @Binding var savePDF: Bool
-
+    
+    @ViewBuilder
     var canvas : some View {
         Canvas {context, size in                    
             for dotIndex in 0..<dots.count {
@@ -65,7 +68,7 @@ struct DotView: View {
             canvas
         }.onChange(of: savePDF) { 
             if savePDF {
-                if let url = manager.resultsFolderPath {
+               if let url = saveFolderURL {
                     savePDF(url: url, name: "dots")
                     savePDF = false
                 }
@@ -75,3 +78,10 @@ struct DotView: View {
     }
 }
 
+#Preview {
+    @Previewable @State var savePDF: Bool = true
+    DotView(dots: [], size: CGSize(width: 100, height: 100), savePDF: $savePDF)
+    .environmentObject(Manager())
+    .frame(width: 40, height: 40)
+    
+}

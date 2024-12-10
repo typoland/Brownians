@@ -155,7 +155,7 @@ Element.Index == Int {
         let x = Int(point.x)// - size/2)
         let y = Int(point.y)// - size/2)
         
-        guard !self.isEmpty, !self[0].isEmpty, y<count, x < self[0].count else {return Double.nan}
+        guard !self.isEmpty, !self[0].isEmpty, y<count, x < self[0].count else {return 0}
         return self[y][x]
     }
 }

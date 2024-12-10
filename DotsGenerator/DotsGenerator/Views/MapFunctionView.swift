@@ -24,7 +24,7 @@ struct MapFunctionView: View {
     func updateImage(size: CGSize)  {
         Task {
             //Generate Image
-            testImage = await function.image(
+            testImage = function.image(
                 size: format_3_4(size), 
                 simulate: manager.finalSize)
         }

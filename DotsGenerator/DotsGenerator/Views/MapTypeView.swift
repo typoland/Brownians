@@ -11,9 +11,9 @@ struct MapTypeView: View {
     var title: String
     @Binding var map: MapType
     @Binding var dotSize: DotSize
-    
+    var sizeOwner: Manager.SizeOwner
     var range: ClosedRange<Double>
-    
+    @EnvironmentObject var manager: Manager
     
 
     
@@ -29,7 +29,12 @@ struct MapTypeView: View {
             switch map {
             case .function( let function):
                 let binding = Binding(get: {function}, 
-                                      set: {map = .function(function: $0)})
+                                      set: {
+                    map = .function(function: $0)
+                    if sizeOwner == manager.sizeOwner {
+                        manager.sizeOwner = .manager
+                    }
+                })
                 MapFunctionView(function: binding)
                 
             case .image(image: let image, filters: let filtersChain):
@@ -43,7 +48,12 @@ struct MapTypeView: View {
             case .gradient(let type, let stops, let data):
                 let stopsBinding = Binding(
                     get: {stops}, 
-                    set: {map = .gradient(type: type, stops: $0, data: data)})
+                    set: {
+                        map = .gradient(type: type, stops: $0, data: data)
+                        if sizeOwner == manager.sizeOwner {
+                            manager.sizeOwner = .manager
+                        }
+                    })
                 
                 let typeBinding = Binding (
                     get: {type}, 
@@ -86,7 +96,7 @@ struct MapTypeView: View {
         .image(image: Defaults.imageSource, 
                filters: Defaults.filtersChain)
     @Previewable @State var size = DotSize(minSize: 10, maxSize: 20)
-    MapTypeView(title: "test",map: $i, dotSize: $size, range: 0...1000).environmentObject(Manager())
+    MapTypeView(title: "test",map: $i, dotSize: $size, sizeOwner: .manager, range: 0...1000).environmentObject(Manager())
 }
 
 

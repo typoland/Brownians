@@ -14,5 +14,8 @@ struct DotsGeneratorApp: App {
         WindowGroup {
             ContentView(manager: manager)
         }
+        .commands {
+            ManagerCommands()
+        }
     }
 }

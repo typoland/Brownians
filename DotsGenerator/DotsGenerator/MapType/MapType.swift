@@ -129,7 +129,7 @@ enum MapType: Codable {
             
             return .image(image: .flatten(flatten), 
                           filters: FiltersChain(chain:[]))
-        case .gradient(let type, let stops, let data) :
+        case .gradient:
             let renderedGradient  =  image(size: size)
             let source = ImageSource.flatten(renderedGradient)
             return .image(image: source, 
@@ -142,7 +142,7 @@ enum MapType: Codable {
     @MainActor func image(size: CGSize)  -> CIImage {
         switch self {
             
-        case .image(image: let image, filters: let filters):
+        case .image(let image, _):
             return image.image
             
         case .function(function: let function):

@@ -11,6 +11,8 @@ struct ManagerCommands: Commands {
     
     @FocusedBinding(\.savePath) var savePath: Bool?
     @FocusedBinding(\.saveFile) var saveFile: Bool?
+    @FocusedBinding(\.openSetup) var openSetup: Bool?
+    @FocusedBinding(\.saveSetup) var saveSetup: Bool?
     @State var showSavePath: Bool?
     //@State var showSavePath: Bool = false
     
@@ -18,10 +20,16 @@ struct ManagerCommands: Commands {
         CommandGroup(replacing: CommandGroupPlacement.newItem) {
             Button("Choose Save Folder") {
                 savePath = true
-            }
+            }.keyboardShortcut("s", modifiers: [.command ,.option])
             Button("Save Rendred Image") {
                 saveFile = true
-            }
+            }.keyboardShortcut("s", modifiers: .command)
+            Button("Open Setup") {
+                openSetup = true
+            }.keyboardShortcut("o", modifiers: .control)
+            Button("Save Setup") {
+                saveSetup = true
+            }.keyboardShortcut("s", modifiers: .control)
         }
     }
 }
@@ -35,11 +43,11 @@ private struct SaveFile: FocusedValueKey {
 }
 
 private struct SaveSetup: FocusedValueKey {
-    typealias Value = Bool
+    typealias Value = Binding<Bool>
 }
 
 private struct OpenSetup: FocusedValueKey {
-    typealias Value = Bool
+    typealias Value = Binding<Bool>
 }
 
 
@@ -54,11 +62,11 @@ extension FocusedValues {
         set { self [SaveFile.self] = newValue }
     }
     
-    var saveSetup: Bool? {
+    var saveSetup: Binding<Bool>? {
         get { self [SaveSetup.self] }
         set { self [SaveSetup.self] = newValue }
     }
-    var openSetup: Bool? {
+    var openSetup: Binding<Bool>? {
         get { self [OpenSetup.self] }
         set { self [OpenSetup.self] = newValue }
     }

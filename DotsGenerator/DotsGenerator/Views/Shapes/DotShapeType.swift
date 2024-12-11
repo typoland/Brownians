@@ -69,7 +69,15 @@ enum DotShapeType: Codable, Hashable {
         }
     
     } 
-        
+    var size: CGSize {
+        switch self {
+        case.oval(let size): return size
+        case .diamond(let size): return size
+        case .rectangle(size: let size): return size
+        case .triangle(size: let size): return size
+        }
+    }    
+    
     var index: Int {
         switch self {
         case .oval: return 0
@@ -78,12 +86,12 @@ enum DotShapeType: Codable, Hashable {
         case .diamond: return 3
         }
     }
-    init(index: Int) throws {
+    init(index: Int, size: CGSize) throws {
         switch index {
-        case 0: self = .oval(size: CGSize(width: 1, height: 1))
-        case 1:  self = .rectangle(size: CGSize(width: 1, height: 1))
-        case 2:  self = .triangle(size: CGSize(width: 1, height: 1))
-        case 3:  self = .diamond(size: CGSize(width: 1, height: 1))
+        case 0: self = .oval(size: size)
+        case 1:  self = .rectangle(size: size)
+        case 2:  self = .triangle(size: size)
+        case 3:  self = .diamond(size: size)
         default: throw Errors.noIndex(index)   
         }
     }

@@ -14,7 +14,7 @@ struct ContentView: View {
     @State var refreshDrawing: Bool = false
     @State var savePDF: Bool = false
     @State var choosePath: Bool = false
-   
+    
     @State var somethingChanged: Bool = false
     
     @AppStorage("resultsFolder") var resultsFolderPath: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("results")
@@ -23,7 +23,6 @@ struct ContentView: View {
     var finalView : some View {
         let size = manager.finalSize * manager.finalScale
         GenerateDotsView(refresh: $refreshDrawing,
-                         
                          savePDF: $savePDF,
                          saveFolderURL: resultsFolderPath)
         .environmentObject(manager)
@@ -63,41 +62,42 @@ struct ContentView: View {
             print ("Change \(manager.sizeOwner)")
             manager.updateSizes()
             
-                   
+            
         }
         .toolbar {
             
-                ImageSizeView(size: $manager.finalSize)
-                Spacer(minLength: 100)
-                
-                Button(action: {
-                    refreshDrawing.toggle()
-                }, 
-                       label: {
-                    Text("\(refreshDrawing ? "Stop" : " Start") Render").font(.system(size: 24))
-                    refreshDrawing 
-                    ? Image(systemName: "stop.circle").frame(width: 50, height: 50)
-                    : Image(systemName: "play.rectangle").frame(width: 50,height: 50)
-                })
-                .buttonStyle( .borderless )
-                .controlSize( .extraLarge)
-                
-                Text("\(manager.finalSize)")
-                Button (action: {
-                        savePDF = true
-                }, label: {Text("Save to \(pathNiceString)")})
-                
-            }.environmentObject(manager)
-            .focusedValue(\.savePath, $choosePath)
-            .focusedValue(\.saveFile, $savePDF)
-            .fileImporter(isPresented: $choosePath, 
-                          allowedContentTypes: [.folder]) { result in
-                if case .success(let url) = result {
-                    resultsFolderPath = url
-                    debugPrint("new Path:",resultsFolderPath)
-                }
-                print ("try to laoad")}
-       
+            ImageSizeView(size: $manager.finalSize)
+            Spacer(minLength: 100)
+            
+            Button(action: {
+                refreshDrawing.toggle()
+            }, 
+                   label: {
+                Text("\(refreshDrawing ? "Stop" : " Start") Render").font(.system(size: 24))
+                refreshDrawing 
+                ? Image(systemName: "stop.circle").frame(width: 50, height: 50)
+                : Image(systemName: "play.rectangle").frame(width: 50,height: 50)
+            })
+            .buttonStyle( .borderless )
+            .controlSize( .extraLarge)
+            
+            Text("\(manager.finalSize)")
+            Button (action: {
+                savePDF = true
+            }, label: {Text("Save to \(pathNiceString)")})
+            
+        }
+        .environmentObject(manager)
+        .focusedValue(\.savePath, $choosePath)
+        .focusedValue(\.saveFile, $savePDF)
+        .fileImporter(isPresented: $choosePath, 
+                      allowedContentTypes: [.folder]) { result in
+            if case .success(let url) = result {
+                resultsFolderPath = url
+                debugPrint("new Path:",resultsFolderPath)
+            }
+            print ("try to laoad")}
+        
     }
 }
 

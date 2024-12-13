@@ -17,6 +17,9 @@ struct ContentView: View {
     
     @State var somethingChanged: Bool = false
     
+    @State var info: String = ""
+    @State var timeElapsed: Bool = false
+    
     @AppStorage("resultsFolder") var resultsFolderPath: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("results")
     
     @ViewBuilder
@@ -40,11 +43,27 @@ struct ContentView: View {
     let largeFont = NSFont.systemFont(ofSize: 60)
     var configuration = NSImage.SymbolConfiguration(textStyle: .body, scale: .large)
     
+    func setInfo(_ txt: String) {
+        print("setInfo:", txt)
+        info = txt
+        Task {
+            timeElapsed = true
+            try? await Task.sleep(nanoseconds: 7500000000)
+            timeElapsed = false
+        }
+    }
     
     var body: some View {
         HStack (spacing: 20) {
-            
-            ManagerSetupView()
+            VStack {
+                ManagerSetupView()
+                //ManagerSetupIOView(taskCompletion: setInfo)
+#if DEBUG
+                Text("\(timeElapsed ? info : manager.description)").animation(.easeInOut)
+#else
+                Text("\(timeElapsed ? info : "")").animation(.easeInOut)
+#endif
+            }
                 .environmentObject(manager)
                 .frame(width: 350) 
             
@@ -94,7 +113,8 @@ struct ContentView: View {
                       allowedContentTypes: [.folder]) { result in
             if case .success(let url) = result {
                 resultsFolderPath = url
-                debugPrint("new Path:",resultsFolderPath)
+                setInfo("save path set: \(pathNiceString)")
+                debugPrint("new Path:", resultsFolderPath)
             }
             print ("try to laoad")}
         

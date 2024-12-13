@@ -20,22 +20,24 @@ struct ImageSizeView: View {
             let disabled = manager.sizeOwner != .manager
             if !disabled {
                 Text("Width:")  
-                EnterTextFiledView("width",
+                EnterTextFiledView(titleKey: "width",
                                    value: Binding(get: {Double(size.width)}, 
                                                   set: {size.width = $0}),
-                                   in: 0...10000)
+                                   range: 0...10000)
                 .frame(width: 50)
                 
                 
                 Text("Height:")
-                EnterTextFiledView("height",
+                EnterTextFiledView(titleKey: "height",
                                    value: Binding(get: {Double(size.height)}, 
                                                   set: {size.height = $0}),
-                                   in: 0...10000)
+                                   range: 0...10000)
                 .frame(width: 50)
             } else {
                 Text("Scale:")
-                EnterTextFiledView("scale", value: $manager.finalScale, in: 0.2...10)
+                EnterTextFiledView(titleKey: "scale", 
+                                   value: $manager.finalScale, 
+                                   range: 0.2...10)
                     .frame(width: 35)
             }            
         }

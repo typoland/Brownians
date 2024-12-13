@@ -16,15 +16,15 @@ struct SizesView: View {
         VStack {
             HStack {
                 Text("min:")
-                EnterTextFiledView("minimum", 
+                EnterTextFiledView(titleKey: "minimum", 
                                    value: $dotSize.minSize,
-                                   in: range)
+                                   range: range)
             }
             HStack {
                 Text("max:")
-                EnterTextFiledView("maximum", 
+                EnterTextFiledView(titleKey: "maximum", 
                                    value: $dotSize.maxSize,
-                                   in: range)
+                                   range: range)
             }
         }
     }

@@ -13,23 +13,22 @@ struct ManagerCommands: Commands {
     @FocusedBinding(\.saveFile) var saveFile: Bool?
     @FocusedBinding(\.openSetup) var openSetup: Bool?
     @FocusedBinding(\.saveSetup) var saveSetup: Bool?
-    @State var showSavePath: Bool?
-    //@State var showSavePath: Bool = false
     
     var body: some Commands {
-        CommandGroup(replacing: CommandGroupPlacement.newItem) {
+        CommandGroup(before: CommandGroupPlacement.newItem) {
+        //CommandGroup(replacing: CommandGroupPlacement.newItem) {
             Button("Choose Save Folder") {
                 savePath = true
-            }.keyboardShortcut("s", modifiers: [.command ,.option])
+            }.keyboardShortcut("s", modifiers: [.control ,.option])
             Button("Save Rendred Image") {
                 saveFile = true
-            }.keyboardShortcut("s", modifiers: .command)
-            Button("Open Setup") {
-                openSetup = true
-            }.keyboardShortcut("o", modifiers: .control)
-            Button("Save Setup") {
-                saveSetup = true
-            }.keyboardShortcut("s", modifiers: .control)
+            }.keyboardShortcut("s", modifiers: [.control])
+//            Button("Open Setup") {
+//                openSetup = true
+//            }.keyboardShortcut("o", modifiers: .control)
+//            Button("Save Setup") {
+//                saveSetup = true
+//            }.keyboardShortcut("s", modifiers: .control)
         }
     }
 }
@@ -66,6 +65,7 @@ extension FocusedValues {
         get { self [SaveSetup.self] }
         set { self [SaveSetup.self] = newValue }
     }
+    
     var openSetup: Binding<Bool>? {
         get { self [OpenSetup.self] }
         set { self [OpenSetup.self] = newValue }

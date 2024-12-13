@@ -8,9 +8,10 @@ import Foundation
 import CoreImage
 import Combine
 import SwiftUI
+import UniformTypeIdentifiers
 
 @MainActor
-class Manager: ObservableObject, @preconcurrency Codable {
+class Manager: FileDocument, ObservableObject, @preconcurrency Codable {
     
     enum SizeOwner : String, Codable {
         case manager
@@ -18,6 +19,7 @@ class Manager: ObservableObject, @preconcurrency Codable {
         case sizeMap
         case rotationMap
     }
+    static var readableContentTypes: [UTType] { [.dotdot] }
     
     @Published var sizeOwner: SizeOwner = .manager
     @Published var finalSize: CGSize = CGSize(width: 800, height: 600)
@@ -34,6 +36,22 @@ class Manager: ObservableObject, @preconcurrency Codable {
     @Published var rotationLimits = DotSize(minSize: 0, maxSize: Double.tau)
     @Published var dotShape: DotShapeType = .rectangle(size: CGSize(width: 2, height: 0.5))
     
+    required init(configuration: ReadConfiguration) throws {
+        let decoder = JSONDecoder()
+        guard let data = configuration.file.regularFileContents,
+              let newSelf = try? decoder.decode(Manager.self, from: data)
+        else {
+            throw CocoaError(.fileReadCorruptFile)
+        }
+        update(from: newSelf)
+    }
+    
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(self)
+        return .init(regularFileWithContents: data)
+    }
+
     required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.sizeOwner = try container.decode(SizeOwner.self, forKey: .sizeOwner)
@@ -99,9 +117,13 @@ class Manager: ObservableObject, @preconcurrency Codable {
         chaos = manager.chaos
     }
     
-    init () {}
+    nonisolated init () {}
      
-    private func mapValue(map: MapType, dotSize: DotSize, in size: CGSize) -> (CGPoint, CGSize) -> Double {
+    private func mapValue(map: MapType, 
+                          dotSize: DotSize, 
+                          in size: CGSize) 
+    -> (CGPoint, CGSize) -> Double 
+    {
         let valueCount : (CGPoint, CGSize) ->Double
         let map = map.faltten(to: size)
         let size = CGSize(width: dotSize.maxSize, height: dotSize.maxSize)

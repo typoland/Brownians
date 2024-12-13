@@ -51,7 +51,10 @@ enum ImageSource: Codable {
     var image: CIImage {
         switch self {
         case .url(let url):
-            return NSImage(contentsOf: url)?.ciImage ?? Defaults.imageSource.image
+            //guard url.startAccessingSecurityScopedResource() else {return Defaults.imageSource.image}
+            let image = NSImage(contentsOf: url)            
+            //url.stopAccessingSecurityScopedResource()
+            return image?.ciImage ?? Defaults.imageSource.image
         case .local(let name):
             return NSImage(named: name)!.ciImage ?? Defaults.imageSource.image
         case .flatten(let ciImage):

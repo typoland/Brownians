@@ -11,13 +11,10 @@ struct MapGradientView: View {
     @Binding var type: MapType.GradientType
     @Binding var stops: [GradientStop]
     @Binding var data: any GradientData
-    //@State var choosen: MapType.GradientType = .linear
-    //@Binding var data: GradientData
+
     
     var body: some View {
-        
-        
-        
+
         VStack {
             
                 Picker("gradient type", selection: $type) { 
@@ -54,8 +51,6 @@ struct MapGradientView: View {
                 }
         }
     }
-    
-    //Rectangle().fill(type)
 }
 
 

@@ -11,8 +11,8 @@ struct ManagerSetupView: View {
     @EnvironmentObject var manager: Manager
 
     @State var refreshPreview: Bool = true
-    @State var openSetup: Bool = false
-    @State var saveSetup: Bool = false
+   // @State var openSetup: Bool = false
+   // @State var saveSetup: Bool = false
 
     @State var info: String = ""
     @State var timeElapsed: Bool = false
@@ -20,11 +20,7 @@ struct ManagerSetupView: View {
 
     @State var dotShapeTypeIndex = 0
 
-    func setInfo(_ txt: String) async {
-        print(txt)
-        info = txt
-        try? await Task.sleep(nanoseconds: 7500000000)
-    }
+   
 
     @State var layer: Layer = .darkness
 
@@ -38,26 +34,26 @@ struct ManagerSetupView: View {
                 Text("Diamond").tag(3)
             }.onChange(of: dotShapeTypeIndex) {
                 let shapeSize = manager.dotShape.size
-                if let new = try? DotShapeType(index: dotShapeTypeIndex, 
-                                               size:  shapeSize) {
+                if let new = try? DotShapeType(index: dotShapeTypeIndex,
+                                               size: shapeSize) {
                     manager.dotShape = new
                 }
             }
             switch manager.dotShape {
             case let .oval(shapeSize):
-                let binding = Binding(get: { shapeSize }, 
+                let binding = Binding(get: { shapeSize },
                                       set: { manager.dotShape = .oval(size: $0) })
                 CGSizeView(size: binding, range: 0 ... 4)
             case let .rectangle(shapeSize):
-                let binding = Binding(get: { shapeSize }, 
+                let binding = Binding(get: { shapeSize },
                                       set: { manager.dotShape = .rectangle(size: $0) })
                 CGSizeView(size: binding, range: 0 ... 4)
             case let .triangle(shapeSize):
-                let binding = Binding(get: { shapeSize }, 
+                let binding = Binding(get: { shapeSize },
                                       set: { manager.dotShape = .triangle(size: $0) })
                 CGSizeView(size: binding, range: 0 ... 4)
             case let .diamond(shapeSize):
-                let binding = Binding(get: { shapeSize }, 
+                let binding = Binding(get: { shapeSize },
                                       set: { manager.dotShape = .diamond(size: $0) })
                 CGSizeView(size: binding, range: 0 ... 4)
             }
@@ -102,15 +98,16 @@ struct ManagerSetupView: View {
         VStack {
             HStack {
                 Text("Chaos:")
-                EnterTextFiledView("0,5...0,99",
+                EnterTextFiledView(titleKey: "0,5...0,99",
                                    value: $manager.chaos,
-                                   in: 0.3 ... 1)
+                                   range: 0.3 ... 1)
             }
             Picker("", selection: $layer) {
                 ForEach(Layer.allCases, id: \.self.rawValue) { name in
                     Text("\(name)").tag(name)
                 }
             }.pickerStyle(.segmented)
+            
             switch layer {
             case .darkness:
                 MapTypeView(title: "Dot size",
@@ -144,103 +141,89 @@ struct ManagerSetupView: View {
         }
     }
 
-    @ViewBuilder
-    var OpenSaveSetup: some View {
-        HStack {
-            Button("save Setup", action: {
-                print("touched save")
-                saveSetup = true
-            })
-            Button("load Setup", action: {
-                print("touched load")
-                openSetup = true
-            })
-        }
-        .fileExporter(isPresented: $saveSetup,
-                      items: [manager]) { result in
-
-            switch result {
-            case let .success(suc):
-                print("succes", suc)
-            case let .failure(error as NSError):
-                Task {
-                    await setInfo(error.localizedDescription)
-                }
-            }
-        }
-        .fileImporter(isPresented: $openSetup,
-                      allowedContentTypes: [.json]) { result in
-            print("try to laoad")
-            switch result {
-            case let .success(url):
-                do {
-                    let decoder = JSONDecoder()
-                    let data = try Data(contentsOf: url)
-                    let newManager = try decoder.decode(Manager.self, from: data)
-                    debugPrint("-----old Manager------")
-                    debugPrint(manager)
-                    debugPrint("-----------")
-
-                    if case let .image(_, importedFilters) = newManager.detailMap,
-                       case let .image(existingImage, _) = manager.detailMap
-                    {
-                        newManager.detailMap = .image(image: existingImage, 
-                                                      filters: importedFilters)
-                    }
-
-                    if case let .image(_, importedFilters) = newManager.sizeMap,
-                       case let .image(existingImage, _) = manager.sizeMap
-                    {
-                        newManager.sizeMap = .image(image: existingImage, 
-                                                    filters: importedFilters)
-                    }
-                    debugPrint("update manager")
-                    manager.update(from: newManager)
-
-                    debugPrint("****** manager *******")
-                    debugPrint(manager)
-                    debugPrint("*************")
-                    refreshPreview = true
-                    Task {
-                        await setInfo("OK")
-                    }
-
-                } catch let error as NSError {
-                    debugPrint("ERROR \(error)")
-                    Task {
-                        await setInfo(error.localizedDescription)
-                    }
-                }
-
-            case let .failure(error as NSError):
-                debugPrint("ERROR \(error)")
-                Task {
-                    await setInfo(error.localizedDescription)
-                }
-            }
-        }
-    }
+    
 
     var body: some View {
         VStack {
-            dotsPreview
+             dotsPreview
             setup
             Spacer()
-            OpenSaveSetup
-                           
-             #if DEBUG
-                        Text ("\(timeElapsed ? info : manager.description)").animation(.easeInOut)
-             #else
-                        Text ("\(timeElapsed ? info : "")").animation(.easeInOut)
-             #endif
-        } .focusedValue(\.openSetup, $openSetup)
-            .focusedValue(\.saveSetup, $saveSetup)
-
+            //IO
+            
+        }
     }
 }
-
 
 #Preview {
     ManagerSetupView()
         .environmentObject(Manager())
 }
+
+/*
+ @ViewBuilder
+ var IO: some View {
+ HStack {
+ Button("save Setup", action: {
+ print("touched save")
+ saveSetup = true
+ })
+ Button("load Setup", action: {
+ print("touched load")
+ openSetup = true
+ })
+ }
+ .focusedValue(\.openSetup, $openSetup)
+ .focusedValue(\.saveSetup, $saveSetup)
+ 
+ .fileImporter(isPresented: $openSetup,
+ allowedContentTypes: [.json]) { result in
+ print("try to laoad")
+ switch result {
+ case let .success(url):
+ do {
+ let decoder = JSONDecoder()
+ let data = try Data(contentsOf: url)
+ let newManager = try decoder.decode(Manager.self, from: data)
+ debugPrint("-----old Manager------")
+ debugPrint(manager)
+ debugPrint("-----------")
+ 
+ if case let .image(_, importedFilters) = newManager.detailMap,
+ case let .image(existingImage, _) = manager.detailMap {
+ newManager.detailMap = .image(image: existingImage,
+ filters: importedFilters)
+ }
+ 
+ if case let .image(_, importedFilters) = newManager.sizeMap,
+ case let .image(existingImage, _) = manager.sizeMap {
+ newManager.sizeMap = .image(image: existingImage,
+ filters: importedFilters)
+ }
+ debugPrint("update manager")
+ manager.update(from: newManager)
+ 
+ debugPrint("****** manager *******")
+ debugPrint(manager)
+ debugPrint("*************")
+ setInfo("OK") // refreshPreview = true
+ 
+ } catch let error as NSError {
+ setInfo("\(error.localizedDescription)")
+ }
+ 
+ case let .failure(error as NSError):
+ setInfo("\(error.localizedDescription)")
+ }
+ }
+ .fileExporter(isPresented: $saveSetup,
+ items: [manager]) { result in
+ 
+ switch result {
+ case let .success(suc):
+ setInfo("OK: \(suc)")
+ case let .failure(error as NSError):
+ setInfo("\(error.localizedDescription)")
+ }
+ }
+ }
+ */

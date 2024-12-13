@@ -143,6 +143,7 @@ enum MapType: Codable {
         switch self {
             
         case .image(let image, _):
+            
             return image.image
             
         case .function(function: let function):

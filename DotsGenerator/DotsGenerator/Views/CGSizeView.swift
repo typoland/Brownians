@@ -10,7 +10,6 @@ struct CGSizeView: View {
     @Binding var size: CGSize
     var range: ClosedRange<CGFloat>
     var body: some View {
-        
         HStack {
             Text ("width" )
             Slider(value: $size.width, in: range)

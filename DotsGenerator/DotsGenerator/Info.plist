@@ -5,13 +5,17 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeIconSystemGenerated</key>
+			<integer>1</integer>
+			<key>CFBundleTypeName</key>
+			<string>Dotdot</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
 			<string>Default</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>com.typoland.DotDot</string>
+				<string>com.typoland.DotsGenerator.dotdot</string>
 			</array>
 		</dict>
 	</array>
@@ -27,11 +31,11 @@
 			<key>UTTypeIcons</key>
 			<dict>
 				<key>UTTypeIconBackgroundName</key>
-				<string></string>
+				<string>Background</string>
 				<key>UTTypeIconBadgeName</key>
-				<string>DocIcon</string>
+				<string></string>
 				<key>UTTypeIconText</key>
-				<string>DOTDOT</string>
+				<string></string>
 			</dict>
 			<key>UTTypeIdentifier</key>
 			<string>com.typoland.DotsGenerator.dotdot</string>
@@ -56,9 +60,9 @@
 			<key>UTTypeIcons</key>
 			<dict>
 				<key>UTTypeIconBackgroundName</key>
-				<string></string>
+				<string>Background</string>
 				<key>UTTypeIconBadgeName</key>
-				<string>DocIcon</string>
+				<string></string>
 				<key>UTTypeIconText</key>
 				<string>DOTDOT</string>
 			</dict>

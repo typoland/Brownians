@@ -29,10 +29,9 @@ struct ImagePicker: View {
                 imageSource = .url(url: url)
                 manager.updateSizes()    
                     showSheet  = true
-                    print("after", showSheet)
               
             },
-                   label: { Text("open Sheet") })
+                   label: { Text("open Image") })
             .buttonStyle(.borderless)
             .controlSize(.mini)
         }
